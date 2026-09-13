@@ -69,7 +69,7 @@ function LoginContent() {
           type="button"
           onClick={handleSSOLogin}
           disabled={loading}
-          className="w-full relative flex items-center justify-center gap-3 bg-[#7367F0] hover:bg-[#6355EE] active:bg-[#5244dd] text-white font-semibold py-3.5 px-6 rounded-full transition-all duration-200 shadow-lg shadow-[#7367f0]/25 hover:shadow-[#7367f0]/40 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed group"
+          className="w-full relative flex items-center justify-center gap-3 bg-[#7367F0] hover:bg-[#6355EE] active:bg-[#5244dd] text-white font-semibold py-3.5 px-6 rounded-xl transition-all duration-200 shadow-lg shadow-[#7367f0]/25 hover:shadow-[#7367f0]/40 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed group"
         >
           {loading ? (
             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
