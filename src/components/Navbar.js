@@ -105,7 +105,8 @@ export default function Navbar({ onSearch }) {
                   className={`transition-colors duration-200 ${
                     isActive("/admin") &&
                     !pathname.startsWith("/admin/users") &&
-                    !pathname.startsWith("/admin/tv")
+                    !pathname.startsWith("/admin/tv") &&
+                    !pathname.startsWith("/admin/blacklist")
                       ? "text-red-500 font-bold"
                       : "text-zinc-300 hover:text-white"
                   }`}
@@ -132,6 +133,18 @@ export default function Navbar({ onSearch }) {
                 >
                   Users
                 </Link>
+                {currentUser?.role === "superadmin" && (
+                  <Link
+                    href="/admin/blacklist"
+                    className={`transition-colors duration-200 ${
+                      isActive("/admin/blacklist")
+                        ? "text-red-500 font-bold"
+                        : "text-zinc-300 hover:text-white"
+                    }`}
+                  >
+                    Blacklist
+                  </Link>
+                )}
               </div>
             )}
           </div>
@@ -340,6 +353,18 @@ export default function Navbar({ onSearch }) {
                 >
                   Manage Users
                 </Link>
+                {currentUser?.role === "superadmin" && (
+                  <Link
+                    href="/admin/blacklist"
+                    className={`py-2 px-3 rounded-lg transition ${
+                      isActive("/admin/blacklist")
+                        ? "bg-red-600/20 text-red-500 font-bold"
+                        : "text-zinc-300 hover:bg-zinc-900"
+                    }`}
+                  >
+                    Blacklist
+                  </Link>
+                )}
               </>
             )}
           </div>

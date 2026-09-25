@@ -1,7 +1,9 @@
 import { connectDB } from "@/lib/db";
 import Movie from "@/models/Movie";
+import { isItemBlacklisted } from "@/lib/blacklist";
 import mongoose from "mongoose";
 import Link from "next/link";
+import CleanVideoPlayer from "@/components/CleanVideoPlayer";
 
 export const revalidate = 60;
 
@@ -20,24 +22,30 @@ async function getMovie(id) {
   return movie ? JSON.parse(JSON.stringify(movie)) : null;
 }
 
-function getDriveId(url) {
-  const patterns = [
-    /\/d\/([^/]+)/, // .../d/FILEID/...
-    /id=([^&]+)/, // ...id=FILEID
-    /\/file\/([^/?]+)/, // .../file/FILEID
-  ];
-  for (const p of patterns) {
-    const match = url?.match(p);
-    if (match) return match[1];
-  }
-  return null;
-}
-
-import CleanVideoPlayer from "@/components/CleanVideoPlayer";
-
 export default async function MovieWatch({ params }) {
   const { id } = await params;
   const movie = await getMovie(id);
+
+  // Check blacklist
+  const tmdbId = movie?.movieId || (!isNaN(Number(id)) ? Number(id) : null);
+  if (tmdbId) {
+    const isBanned = await isItemBlacklisted(tmdbId, "movie");
+    if (isBanned) {
+      return (
+        <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4">
+          <p className="text-xl font-semibold mb-4 text-center text-red-500">
+            Film ini tidak dapat diputar karena telah dinonaktifkan oleh administrator.
+          </p>
+          <Link
+            href="/"
+            className="px-4 py-2 bg-red-600 rounded-lg text-sm hover:bg-red-700 transition"
+          >
+            Kembali ke Beranda
+          </Link>
+        </div>
+      );
+    }
+  }
 
   if (!movie) {
     return (

@@ -1,9 +1,11 @@
 export const revalidate = 60;
 import TvWatchPlayer from "@/components/TvWatchPlayer";
 import { getTvShowDetails, getTvSeasonEpisodes, isSafeMovie } from "@/lib/tmdb";
+import { isItemBlacklisted } from "@/lib/blacklist";
 import { connectDB } from "@/lib/db";
 import TvShow from "@/models/TvShow";
 import Movie from "@/models/Movie";
+import Link from "next/link";
 
 function getDriveId(url) {
   const patterns = [
@@ -23,6 +25,25 @@ export default async function TvWatchPage({ params, searchParams }) {
   const sParams = await searchParams;
   const season = parseInt(sParams?.season || "1", 10);
   const episode = parseInt(sParams?.episode || "1", 10);
+
+  // Check blacklist
+  const isBanned = await isItemBlacklisted(id, "tv");
+  if (isBanned) {
+    return (
+      <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4">
+        <h1 className="text-2xl font-bold text-red-500 mb-2">Serial Tidak Tersedia</h1>
+        <p className="text-zinc-400 text-sm mb-4">
+          Serial TV ini tidak dapat diputar karena telah dinonaktifkan oleh administrator.
+        </p>
+        <Link
+          href="/"
+          className="px-4 py-2 bg-red-600 rounded-lg text-sm hover:bg-red-700 transition"
+        >
+          Kembali ke Beranda
+        </Link>
+      </div>
+    );
+  }
 
   let tv = null;
   let seasonData = { episodes: [] };

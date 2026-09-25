@@ -1,10 +1,12 @@
 import { connectDB } from "@/lib/db";
 import Movie from "@/models/Movie";
+import { filterBlacklistedMovies } from "@/lib/blacklist";
 
 export async function GET() {
   await connectDB();
-  const movies = await Movie.find().sort({ _id: -1 });
-  return Response.json(movies);
+  const movies = await Movie.find().sort({ _id: -1 }).lean();
+  const safe = await filterBlacklistedMovies(movies);
+  return Response.json(safe);
 }
 
 export async function POST(req) {

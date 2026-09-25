@@ -1,4 +1,5 @@
 import { searchMovies } from "@/lib/tmdb";
+import { filterBlacklistedMovies } from "@/lib/blacklist";
 
 export async function GET(req) {
   try {
@@ -11,7 +12,8 @@ export async function GET(req) {
     }
 
     const results = await searchMovies(query, year);
-    return Response.json(results);
+    const safeResults = await filterBlacklistedMovies(results);
+    return Response.json(safeResults);
   } catch (error) {
     console.error("Error in TMDB search route:", error);
     return Response.json(

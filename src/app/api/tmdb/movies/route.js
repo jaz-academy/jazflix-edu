@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getMoviesPaginated, getMovieGenres } from "@/lib/tmdb";
 import { connectDB } from "@/lib/db";
 import Movie from "@/models/Movie";
+import { filterBlacklistedMovies } from "@/lib/blacklist";
 
 export async function GET(request) {
   try {
@@ -71,11 +72,13 @@ export async function GET(request) {
         hasVideo: true,
       }));
 
+      const safeResults = await filterBlacklistedMovies(results);
+
       return NextResponse.json({
         page,
         totalPages,
-        totalResults,
-        results,
+        totalResults: safeResults.length,
+        results: safeResults,
       });
     }
 
@@ -111,6 +114,9 @@ export async function GET(request) {
     } catch (dbErr) {
       console.error("Failed to check local movie videoUrl in API:", dbErr);
     }
+
+    // Filter out active blacklisted movies
+    data.results = await filterBlacklistedMovies(data.results || []);
 
     return NextResponse.json(data);
   } catch (err) {

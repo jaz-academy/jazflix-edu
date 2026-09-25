@@ -3,11 +3,26 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import TvDetail from "@/components/TvDetail";
 import { getTvShowDetails, getTvSeasonEpisodes, getTvShowsPaginated, isSafeMovie } from "@/lib/tmdb";
+import { isItemBlacklisted, filterBlacklistedTv } from "@/lib/blacklist";
 import { connectDB } from "@/lib/db";
 import TvShow from "@/models/TvShow";
 
 export default async function TvPage({ params }) {
   const { id } = await params;
+
+  // Check blacklist early
+  const isBanned = await isItemBlacklisted(id, "tv");
+  if (isBanned) {
+    return (
+      <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4">
+        <Navbar />
+        <h1 className="text-3xl font-bold mb-4 text-red-500">Konten Tidak Tersedia</h1>
+        <p className="text-zinc-400 text-center max-w-md">
+          Serial TV ini tidak tersedia atau telah dinonaktifkan oleh administrator.
+        </p>
+      </div>
+    );
+  }
 
   let tv = null;
   let initialEpisodes = [];
@@ -23,7 +38,8 @@ export default async function TvPage({ params }) {
 
       // Fetch similar popular TV shows
       const pop = await getTvShowsPaginated({ category: "popular", page: 1 });
-      similarTv = (pop.results || []).filter((item) => String(item.id) !== String(id));
+      const rawSimilar = (pop.results || []).filter((item) => String(item.id) !== String(id));
+      similarTv = await filterBlacklistedTv(rawSimilar);
 
       // Fetch local TV from MongoDB to check configured video URLs
       try {

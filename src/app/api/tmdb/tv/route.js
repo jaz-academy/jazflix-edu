@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getTvShowsPaginated, getTvGenres } from "@/lib/tmdb";
 import { connectDB } from "@/lib/db";
 import TvShow from "@/models/TvShow";
+import { filterBlacklistedTv } from "@/lib/blacklist";
 
 export async function GET(request) {
   try {
@@ -69,11 +70,13 @@ export async function GET(request) {
         hasVideo: true,
       }));
 
+      const safeResults = await filterBlacklistedTv(results);
+
       return NextResponse.json({
         page,
         totalPages,
-        totalResults,
-        results,
+        totalResults: safeResults.length,
+        results: safeResults,
       });
     }
 
@@ -109,6 +112,9 @@ export async function GET(request) {
     } catch (dbErr) {
       console.error("Failed to check local TV videoUrl in API:", dbErr);
     }
+
+    // Filter out active blacklisted TV shows
+    data.results = await filterBlacklistedTv(data.results || []);
 
     return NextResponse.json(data);
   } catch (err) {

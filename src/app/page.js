@@ -10,6 +10,7 @@ import {
   getUpcomingMovies,
   getTvShowsPaginated,
 } from "@/lib/tmdb";
+import { filterBlacklistedMovies, filterBlacklistedTv } from "@/lib/blacklist";
 
 async function getLocalMovies() {
   await connectDB();
@@ -24,10 +25,14 @@ async function getLocalTvShows() {
 }
 
 export default async function Home() {
-  const [localMovies, localTvShows] = await Promise.all([
+  const [rawMovies, rawTvShows] = await Promise.all([
     getLocalMovies(),
     getLocalTvShows(),
   ]);
+
+  // Filter out blacklisted local movies and series
+  const localMovies = await filterBlacklistedMovies(rawMovies);
+  const localTvShows = await filterBlacklistedTv(rawTvShows);
 
   // Filter local TV shows that have at least one episode with videoUrl
   const localTvWithVideo = localTvShows.filter((s) =>
@@ -112,14 +117,33 @@ export default async function Home() {
       getTvShowsPaginated({ category: "on_the_air", page: 1 }),
     ]);
 
-    nowPlaying = attachMovieHasVideo(nowPlayingRes);
-    popular = attachMovieHasVideo(popularRes);
-    topRated = attachMovieHasVideo(topRatedRes);
-    upcoming = attachMovieHasVideo(upcomingRes);
+    // Apply blacklist filter to TMDB results
+    const [
+      safeNowPlaying,
+      safePopular,
+      safeTopRated,
+      safeUpcoming,
+      safePopTv,
+      safeTopTv,
+      safeShowTv,
+    ] = await Promise.all([
+      filterBlacklistedMovies(nowPlayingRes),
+      filterBlacklistedMovies(popularRes),
+      filterBlacklistedMovies(topRatedRes),
+      filterBlacklistedMovies(upcomingRes),
+      filterBlacklistedTv(popTvRes.results || []),
+      filterBlacklistedTv(topTvRes.results || []),
+      filterBlacklistedTv(showTvRes.results || []),
+    ]);
 
-    seriesPopular = attachTvHasVideo(popTvRes.results || []);
-    seriesTopRated = attachTvHasVideo(topTvRes.results || []);
-    seriesShowing = attachTvHasVideo(showTvRes.results || []);
+    nowPlaying = attachMovieHasVideo(safeNowPlaying);
+    popular = attachMovieHasVideo(safePopular);
+    topRated = attachMovieHasVideo(safeTopRated);
+    upcoming = attachMovieHasVideo(safeUpcoming);
+
+    seriesPopular = attachTvHasVideo(safePopTv);
+    seriesTopRated = attachTvHasVideo(safeTopTv);
+    seriesShowing = attachTvHasVideo(safeShowTv);
   } catch (error) {
     console.error("Failed to fetch TMDB data for home page, falling back:", error);
     nowPlaying = attachMovieHasVideo(localMovies.slice(0, 10));

@@ -1,11 +1,13 @@
 import { connectDB } from "@/lib/db";
 import TvShow from "@/models/TvShow";
+import { filterBlacklistedTv } from "@/lib/blacklist";
 
 export async function GET() {
   try {
     await connectDB();
     const tvShows = await TvShow.find().sort({ _id: -1 }).lean();
-    return Response.json(tvShows);
+    const safe = await filterBlacklistedTv(tvShows);
+    return Response.json(safe);
   } catch (error) {
     console.error("GET /api/tv error:", error);
     return Response.json({ message: "Failed to fetch TV shows" }, { status: 500 });

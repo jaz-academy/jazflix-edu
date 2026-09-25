@@ -3,6 +3,7 @@ import MoviePage from "@/components/MoviePage";
 import { connectDB } from "@/lib/db";
 import MovieModel from "@/models/Movie";
 import { getMovieDetails, isSafeMovie } from "@/lib/tmdb";
+import { isItemBlacklisted, filterBlacklistedMovies } from "@/lib/blacklist";
 import mongoose from "mongoose";
 
 async function getLocalMovies() {
@@ -29,6 +30,21 @@ export default async function Movie({ params }) {
 
   // 2. Determine the TMDB ID
   const tmdbId = dbMovie?.movieId || (isNumeric ? Number(id) : null);
+
+  // Check blacklist early
+  if (tmdbId) {
+    const isBanned = await isItemBlacklisted(tmdbId, "movie");
+    if (isBanned) {
+      return (
+        <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4">
+          <h1 className="text-3xl font-bold mb-4 text-red-500">Konten Tidak Tersedia</h1>
+          <p className="text-zinc-400 text-center max-w-md">
+            Film ini tidak tersedia atau telah dinonaktifkan oleh administrator.
+          </p>
+        </div>
+      );
+    }
+  }
 
   // 3. Fetch details from TMDB
   let movieData = null;
@@ -77,8 +93,9 @@ export default async function Movie({ params }) {
   // Check if videoUrl exists in MongoDB
   const hasVideo = Boolean(dbMovie && dbMovie.videoUrl);
 
-  // Get similar movies from local catalog
-  const allLocal = await getLocalMovies();
+  // Get similar movies from local catalog (filtered by blacklist)
+  const rawLocal = await getLocalMovies();
+  const allLocal = await filterBlacklistedMovies(rawLocal);
   const movieGenres = movieData.genres || [];
   const similars = allLocal.filter(
     (m) =>
