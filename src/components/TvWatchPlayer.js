@@ -11,6 +11,21 @@ const getYouTubeId = (url) => {
   return match ? match[1] : null;
 };
 
+function extractDriveId(url) {
+  if (!url) return null;
+  const patterns = [
+    /\/d\/([^/]+)/,
+    /id=([^&]+)/,
+    /\/file\/([^/?]+)/,
+    /\/open\?id=([^&]+)/,
+  ];
+  for (const p of patterns) {
+    const match = url.match(p);
+    if (match) return match[1];
+  }
+  return null;
+}
+
 export default function TvWatchPlayer({
   tv,
   currentSeasonNumber,
@@ -20,6 +35,13 @@ export default function TvWatchPlayer({
 }) {
   const router = useRouter();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [playerMode, setPlayerMode] = useState("clean");
+
+  const isDrive =
+    embedUrl &&
+    (embedUrl.includes("drive.google.com") || embedUrl.includes("docs.google.com"));
+  const driveId = isDrive ? extractDriveId(embedUrl) : null;
+  const streamSrc = isDrive && driveId ? `/api/stream/gdrive?fileId=${driveId}` : embedUrl;
 
   const currentEpisode =
     seasonEpisodes.find((ep) => ep.episodeNumber === currentEpisodeNumber) ||
@@ -64,6 +86,24 @@ export default function TvWatchPlayer({
 
         {/* Action Controls */}
         <div className="flex items-center gap-2">
+          {isDrive && (
+            <button
+              onClick={() => setPlayerMode(playerMode === "clean" ? "embed" : "clean")}
+              className="px-2.5 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
+              title="Ganti Mode Pemutar"
+            >
+              <i
+                className={
+                  playerMode === "clean"
+                    ? "fa-brands fa-google-drive text-yellow-400"
+                    : "fa-solid fa-play text-red-500"
+                }
+              />
+              <span className="hidden md:inline">
+                {playerMode === "clean" ? "Mode Embed" : "Mode Player"}
+              </span>
+            </button>
+          )}
           <button
             onClick={() => setDrawerOpen(!drawerOpen)}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition cursor-pointer ${
@@ -83,13 +123,28 @@ export default function TvWatchPlayer({
         {/* Video Player Frame */}
         <div className="flex-1 w-full h-full bg-black relative flex items-center justify-center">
           {embedUrl ? (
-            <iframe
-              src={embedUrl}
-              className="w-full h-full"
-              allow="autoplay; fullscreen"
-              allowFullScreen
-              style={{ border: 0 }}
-            />
+            playerMode === "clean" ? (
+              <div className="w-full h-full relative flex items-center justify-center bg-black">
+                <video
+                  key={`tv-video-${currentSeasonNumber}-${currentEpisodeNumber}`}
+                  src={streamSrc}
+                  controls
+                  playsInline
+                  webkit-playsinline="true"
+                  x5-playsinline="true"
+                  className="w-full h-full object-contain"
+                  onError={() => setPlayerMode("embed")}
+                />
+              </div>
+            ) : (
+              <iframe
+                src={embedUrl}
+                className="w-full h-full"
+                allow="autoplay; fullscreen"
+                allowFullScreen
+                style={{ border: 0 }}
+              />
+            )
           ) : youTubeId ? (
             <div className="w-full h-full flex flex-col">
               <iframe

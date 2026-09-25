@@ -33,6 +33,8 @@ function getDriveId(url) {
   return null;
 }
 
+import CleanVideoPlayer from "@/components/CleanVideoPlayer";
+
 export default async function MovieWatch({ params }) {
   const { id } = await params;
   const movie = await getMovie(id);
@@ -70,32 +72,12 @@ export default async function MovieWatch({ params }) {
     );
   }
 
-  // Cek apakah Google Drive
-  let embedUrl = movie.videoUrl;
-  if (movie.videoUrl.includes("drive.google.com") || movie.videoUrl.includes("docs.google.com")) {
-    const fileId = getDriveId(movie.videoUrl);
-    if (fileId) {
-      embedUrl = `https://drive.google.com/file/d/${fileId}/preview?autoplay=1`;
-    }
-  }
-
   return (
-    <div className="w-full h-screen bg-black overflow-hidden relative">
-      <div className="absolute top-4 left-4 z-50">
-        <Link
-          href={`/movie/${id}`}
-          className="px-4 py-2 bg-black/70 hover:bg-black/90 text-white rounded-lg text-sm backdrop-blur-md flex items-center gap-2 border border-white/20 transition"
-        >
-          <i className="fa-solid fa-arrow-left"></i> Kembali
-        </Link>
-      </div>
-      <iframe
-        src={embedUrl}
-        className="w-full h-full"
-        allow="autoplay; fullscreen"
-        allowFullScreen
-        style={{ border: 0 }}
-      ></iframe>
-    </div>
+    <CleanVideoPlayer
+      title={movie.title || "Film"}
+      subTitle={movie.releaseYear ? `${movie.releaseYear} • ${movie.duration || ""}` : ""}
+      backUrl={`/movie/${id}`}
+      videoUrl={movie.videoUrl}
+    />
   );
 }
