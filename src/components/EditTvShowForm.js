@@ -212,39 +212,31 @@ export default function EditTvShowForm({ initialTvShow }) {
               </p>
             </div>
 
-            {/* Season Switcher */}
-            <div className="flex flex-wrap items-center gap-2">
-              {seasonsArray.map((sNum) => {
-                const count = (seasonEpisodes[sNum] || []).filter(
-                  (e) => e.videoUrl && e.videoUrl.trim()
-                ).length;
-                return (
-                  <button
-                    key={sNum}
-                    type="button"
-                    onClick={() => handleSeasonChange(sNum)}
-                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
-                      activeSeason === sNum
-                        ? "bg-red-600 text-white shadow-lg shadow-red-900/30"
-                        : "bg-zinc-800 hover:bg-zinc-700 text-zinc-300"
-                    }`}
-                  >
-                    <span>Season {sNum}</span>
-                    {count > 0 && (
-                      <span className="px-1.5 py-0.2 rounded-full bg-black/40 text-[10px] text-emerald-300">
-                        {count}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
+            {/* Season Select Switcher */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-zinc-400 font-medium">Musim:</span>
+              <select
+                value={activeSeason}
+                onChange={(e) => handleSeasonChange(Number(e.target.value))}
+                className="px-3.5 py-2 bg-zinc-900 border border-zinc-700 rounded-xl text-xs font-bold text-white focus:outline-none focus:border-red-500 cursor-pointer shadow-md"
+              >
+                {seasonsArray.map((sNum) => {
+                  const count = (seasonEpisodes[sNum] || []).filter(
+                    (e) => e.videoUrl && e.videoUrl.trim()
+                  ).length;
+                  return (
+                    <option key={sNum} value={sNum}>
+                      Season {sNum} {count > 0 ? `(${count} video)` : ""}
+                    </option>
+                  );
+                })}
+              </select>
             </div>
           </div>
 
           {loadingSeason ? (
-            <div className="py-16 text-center text-zinc-400">
-              <i className="fa-solid fa-spinner fa-spin text-3xl text-red-500 mb-2 block" />
-              <span>Memuat data episode Season {activeSeason}...</span>
+            <div className="py-16 text-center text-zinc-400 flex items-center justify-center">
+              <i className="fa-solid fa-spinner fa-spin text-3xl text-red-500" />
             </div>
           ) : currentEpisodesList.length === 0 ? (
             <div className="py-12 text-center text-zinc-500">

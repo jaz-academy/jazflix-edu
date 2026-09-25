@@ -129,7 +129,9 @@ export default function LoginForm() {
       <InstallPWA />
       <Suspense
         fallback={
-          <div className="text-white text-sm">Memuat form login...</div>
+          <div className="flex items-center justify-center">
+            <i className="fa-solid fa-spinner fa-spin text-3xl text-red-500" />
+          </div>
         }
       >
         <LoginContent />

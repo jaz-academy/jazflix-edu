@@ -142,9 +142,8 @@ export default function EditMovieForm({ id, genres = [] }) {
 
   if (isLoading) {
     return (
-      <div className="text-center py-20 text-zinc-400">
-        <i className="fa-solid fa-spinner fa-spin text-2xl mb-2 block" />
-        Memuat data film...
+      <div className="text-center py-20 text-zinc-400 flex items-center justify-center">
+        <i className="fa-solid fa-spinner fa-spin text-3xl text-red-500" />
       </div>
     );
   }

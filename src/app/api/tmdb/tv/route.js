@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getTvShowsPaginated } from "@/lib/tmdb";
+import { getTvShowsPaginated, getTvGenres } from "@/lib/tmdb";
 import { connectDB } from "@/lib/db";
 import TvShow from "@/models/TvShow";
 
@@ -10,6 +10,72 @@ export async function GET(request) {
     const page = parseInt(searchParams.get("page") || "1", 10);
     const genre = searchParams.get("genre") || "";
     const query = searchParams.get("query") || "";
+
+    // Handle Category "Tersedia" (TV shows with episode videoUrl in MongoDB)
+    if (category === "available") {
+      await connectDB();
+      const filter = {
+        "episodes.videoUrl": { $exists: true, $ne: "" },
+      };
+
+      if (query && query.trim()) {
+        filter.$or = [
+          { title: { $regex: query.trim(), $options: "i" } },
+          { originalTitle: { $regex: query.trim(), $options: "i" } },
+        ];
+      }
+
+      if (genre) {
+        let genreName = genre;
+        try {
+          const genresList = await getTvGenres();
+          const matched = genresList.find((g) => String(g.id) === String(genre));
+          if (matched) genreName = matched.name;
+        } catch (e) {
+          // fallback
+        }
+        filter.genres = { $regex: genreName, $options: "i" };
+      }
+
+      const limit = 20;
+      const skip = Math.max(0, (page - 1) * limit);
+
+      const totalResults = await TvShow.countDocuments(filter);
+      const totalPages = Math.max(1, Math.ceil(totalResults / limit));
+
+      const localShows = await TvShow.find(filter)
+        .sort({ updatedAt: -1, createdAt: -1, _id: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean();
+
+      const results = localShows.map((s) => ({
+        _id: s.tvId ? String(s.tvId) : String(s._id),
+        tvId: s.tvId || s._id,
+        id: s.tvId || s._id,
+        title: s.title,
+        originalTitle: s.originalTitle || s.title,
+        description: s.description || "",
+        plot: s.description || "",
+        releaseYear: s.releaseYear || null,
+        numberOfSeasons: s.numberOfSeasons || 1,
+        numberOfEpisodes: s.numberOfEpisodes || (s.episodes ? s.episodes.length : 0),
+        rating: s.rating || "N/A",
+        posterImage: s.posterImage || "",
+        bannerImage: s.bannerImage || "",
+        trailerUrl: s.trailerUrl || "",
+        genres: s.genres || [],
+        ageRating: s.ageRating || "TV-14",
+        hasVideo: true,
+      }));
+
+      return NextResponse.json({
+        page,
+        totalPages,
+        totalResults,
+        results,
+      });
+    }
 
     const data = await getTvShowsPaginated({ category, page, genre, query });
 

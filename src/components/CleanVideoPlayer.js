@@ -355,9 +355,8 @@ export default function CleanVideoPlayer({
 
           {/* Loading Spinner */}
           {isLoading && !hasError && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 pointer-events-none z-20">
-              <i className="fa-solid fa-spinner fa-spin text-4xl text-red-500 mb-3" />
-              <span className="text-xs text-zinc-300 font-medium">Memuat video...</span>
+            <div className="absolute inset-0 flex items-center justify-center bg-black/50 pointer-events-none z-20">
+              <i className="fa-solid fa-spinner fa-spin text-4xl text-red-500" />
             </div>
           )}
 

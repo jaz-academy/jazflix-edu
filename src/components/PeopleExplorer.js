@@ -168,9 +168,8 @@ export default function PeopleExplorer({
 
       {/* People Grid */}
       {loading ? (
-        <div className="py-32 text-center text-zinc-400">
-          <i className="fa-solid fa-spinner fa-spin text-4xl text-red-500 mb-3 block" />
-          <span>Memuat data tokoh perfilman...</span>
+        <div className="py-32 text-center text-zinc-400 flex items-center justify-center">
+          <i className="fa-solid fa-spinner fa-spin text-4xl text-red-500" />
         </div>
       ) : people.length === 0 ? (
         <div className="py-24 text-center text-zinc-500 bg-zinc-950/60 rounded-2xl border border-zinc-800/80">

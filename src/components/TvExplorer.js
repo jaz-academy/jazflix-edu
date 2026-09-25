@@ -20,6 +20,7 @@ export default function TvExplorer({
   const searchTimer = useRef(null);
 
   const categories = [
+    { id: "available", label: "Tersedia", icon: "fa-solid fa-play text-red-500" },
     { id: "popular", label: "Populer", icon: "fa-solid fa-fire text-red-500" },
     { id: "airing_today", label: "Tayang Hari Ini", icon: "fa-solid fa-tv text-zinc-400" },
     { id: "on_the_air", label: "Sedang Tayang", icon: "fa-solid fa-broadcast-tower text-zinc-400" },
@@ -116,9 +117,9 @@ export default function TvExplorer({
       </div>
 
       {/* Filter Tabs & Genre Selector Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        {/* Category Tabs */}
-        <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+        {/* Category Tabs (Desktop / Tablet: sm and up) */}
+        <div className="hidden sm:flex flex-wrap items-center gap-2">
           {categories.map((cat) => (
             <button
               key={cat.id}
@@ -135,9 +136,43 @@ export default function TvExplorer({
           ))}
         </div>
 
-        {/* Genre Selector */}
+        {/* Mobile Filter Selects (sm:hidden) */}
+        <div className="flex sm:hidden items-center gap-2 w-full">
+          <div className="flex-1">
+            <select
+              value={category}
+              onChange={(e) => handleCategoryChange(e.target.value)}
+              className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-700 rounded-xl text-xs text-white focus:outline-none focus:border-red-500 cursor-pointer"
+            >
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {genres.length > 0 && (
+            <div className="flex-1">
+              <select
+                value={genre}
+                onChange={(e) => handleGenreChange(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-700 rounded-xl text-xs text-white focus:outline-none focus:border-red-500 cursor-pointer"
+              >
+                <option value="">Semua Genre</option>
+                {genres.map((g) => (
+                  <option key={g.id} value={g.id}>
+                    {g.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+        </div>
+
+        {/* Genre Selector (Desktop / Tablet: sm and up) */}
         {genres.length > 0 && (
-          <div className="flex items-center gap-2">
+          <div className="hidden sm:flex items-center gap-2">
             <span className="text-xs text-zinc-400 font-medium">Genre:</span>
             <select
               value={genre}
@@ -166,9 +201,8 @@ export default function TvExplorer({
 
       {/* TV Shows Grid */}
       {loading ? (
-        <div className="py-32 text-center text-zinc-400">
-          <i className="fa-solid fa-spinner fa-spin text-4xl text-red-500 mb-3 block" />
-          <span>Memuat koleksi serial TV...</span>
+        <div className="py-32 text-center text-zinc-400 flex items-center justify-center">
+          <i className="fa-solid fa-spinner fa-spin text-4xl text-red-500" />
         </div>
       ) : tvShows.length === 0 ? (
         <div className="py-24 text-center text-zinc-500 bg-zinc-950/60 rounded-2xl border border-zinc-800/80">
@@ -204,17 +238,18 @@ export default function TvExplorer({
                   </div>
                 )}
 
-                {/* Top-Left: Play icon kotak merah border jika serial tersedia videoUrl di mongodb, atau badge SERIES */}
-                {t.hasVideo ? (
+                {/* Top-Left: Badge SERIES (Hitam seperti PG-13) */}
+                <div className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md bg-black/80 backdrop-blur-md text-zinc-300 text-[10px] font-semibold border border-zinc-700">
+                  SERIES
+                </div>
+
+                {/* Bottom-Right: Play icon kotak merah border jika serial tersedia videoUrl di mongodb */}
+                {t.hasVideo && (
                   <div
-                    className="absolute top-2.5 left-2.5 w-6 h-6 rounded-md bg-red-600/90 border border-red-400/80 text-white flex items-center justify-center shadow-lg shadow-red-950/60 backdrop-blur-sm pointer-events-none"
+                    className="absolute bottom-2.5 right-2.5 w-6 h-6 rounded-md bg-red-600/90 border border-red-400/80 text-white flex items-center justify-center shadow-lg shadow-red-950/60 backdrop-blur-sm pointer-events-none"
                     title="Tersedia untuk ditonton di Jazflix"
                   >
                     <i className="fa-solid fa-play text-[10px] ml-0.5" />
-                  </div>
-                ) : (
-                  <div className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md bg-red-600/90 backdrop-blur-md text-white text-[10px] font-bold shadow-md">
-                    SERIES
                   </div>
                 )}
               </div>

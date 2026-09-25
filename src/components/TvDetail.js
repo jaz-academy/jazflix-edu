@@ -242,11 +242,8 @@ export default function TvDetail({
           {/* Video Player Container */}
           <div className="rounded-2xl overflow-hidden shadow-2xl bg-zinc-900 relative min-h-[350px] md:min-h-[480px] border border-zinc-800 flex-1">
             {loadingEpisodeTrailer && (
-              <div className="absolute inset-0 bg-black/80 z-20 flex flex-col items-center justify-center text-white gap-3 backdrop-blur-sm">
+              <div className="absolute inset-0 bg-black/80 z-20 flex items-center justify-center text-white backdrop-blur-sm">
                 <i className="fa-solid fa-spinner fa-spin text-3xl text-red-500" />
-                <span className="text-xs text-zinc-300 font-medium tracking-wide">
-                  Memuat trailer {selectedEpisode ? `Episode ${selectedEpisode.episodeNumber}` : ""}...
-                </span>
               </div>
             )}
 
@@ -490,34 +487,30 @@ export default function TvDetail({
             </h2>
           </div>
 
-          {/* Seasons Switcher Buttons */}
+          {/* Seasons Switcher Select */}
           {tv.seasons && tv.seasons.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2">
-              {tv.seasons.map((s) => (
-                <button
-                  key={s.season_number}
-                  onClick={() => handleSeasonChange(s.season_number)}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
-                    selectedSeason === s.season_number
-                      ? "bg-red-600 text-white shadow-lg shadow-red-900/30"
-                      : "bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800"
-                  }`}
-                >
-                  <span>{s.name || `Season ${s.season_number}`}</span>
-                  <span className="text-[10px] opacity-75 font-mono">
-                    ({s.episode_count || "-"} eps)
-                  </span>
-                </button>
-              ))}
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-zinc-400 font-medium">Musim:</span>
+              <select
+                value={selectedSeason}
+                onChange={(e) => handleSeasonChange(Number(e.target.value))}
+                className="px-3.5 py-2 bg-zinc-900 border border-zinc-700 rounded-xl text-xs font-bold text-white focus:outline-none focus:border-red-500 cursor-pointer shadow-md"
+              >
+                {tv.seasons.map((s) => (
+                  <option key={s.season_number} value={s.season_number}>
+                    {s.name || `Season ${s.season_number}`}
+                    {s.episode_count ? ` (${s.episode_count} eps)` : ""}
+                  </option>
+                ))}
+              </select>
             </div>
           )}
         </div>
 
         {/* Episode Cards Grid */}
         {loadingSeason ? (
-          <div className="py-20 text-center text-zinc-400">
-            <i className="fa-solid fa-spinner fa-spin text-3xl text-red-500 mb-2 block" />
-            <span>Memuat data episode Season {selectedSeason}...</span>
+          <div className="py-20 text-center text-zinc-400 flex items-center justify-center">
+            <i className="fa-solid fa-spinner fa-spin text-3xl text-red-500" />
           </div>
         ) : episodes.length === 0 ? (
           <div className="py-16 text-center text-zinc-500 bg-zinc-900/40 rounded-2xl border border-zinc-800/60">

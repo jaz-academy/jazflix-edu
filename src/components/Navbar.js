@@ -66,10 +66,10 @@ export default function Navbar({ onSearch }) {
 
   return (
     <nav
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 w-full z-50 transition-colors duration-300 ${
         scrolled || mobileMenuOpen
-          ? "bg-black/90 backdrop-blur-md border-b border-zinc-800/80 shadow-2xl"
-          : "bg-gradient-to-b from-black/80 via-black/30 to-transparent"
+          ? "bg-black/95 shadow-2xl"
+          : "bg-gradient-to-b from-black/90 via-black/40 to-transparent"
       }`}
     >
       <div className="w-full flex items-center justify-between px-4 md:px-8 py-3.5">
@@ -287,7 +287,7 @@ export default function Navbar({ onSearch }) {
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-zinc-950/95 border-b border-zinc-800 px-6 py-5 space-y-4 shadow-2xl backdrop-blur-xl animate-in fade-in duration-200">
+        <div className="lg:hidden bg-black/95 px-6 py-5 space-y-4 shadow-2xl animate-in fade-in duration-200">
           <div className="flex flex-col space-y-3 text-sm font-medium">
             {navLinks.map((link) => (
               <Link

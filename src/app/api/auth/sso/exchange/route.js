@@ -10,28 +10,33 @@ export async function POST(request) {
       return NextResponse.json({ error: "Authorization code is required" }, { status: 400 });
     }
 
-    const idpUrl = (process.env.JAZACADEMY_IDP_URL || "http://localhost:8000").replace(/\/$/, "");
-    const clientId = process.env.JAZACADEMY_CLIENT_ID || "5";
-    const clientSecret = process.env.JAZACADEMY_CLIENT_SECRET;
+    const host = request.headers.get("x-forwarded-host") || request.headers.get("host") || "localhost:3000";
+    const proto = request.headers.get("x-forwarded-proto") || (host.includes("localhost") ? "http" : "https");
+
+    const idpUrl = (process.env.JAZACADEMY_IDP_URL || "https://jazacademy.id").replace(/\/$/, "");
+    const clientId = process.env.JAZACADEMY_CLIENT_ID || "4";
+    const clientSecret = process.env.JAZACADEMY_CLIENT_SECRET || "IxD5VbEp3FcmFCngAYaVKbY9gYMSsU4laVx3fD5W";
     const redirectUri =
       redirect_uri ||
       process.env.JAZACADEMY_REDIRECT_URI ||
-      "http://localhost:3000/api/auth/sso/callback";
+      `${proto}://${host}/api/auth/sso/callback`;
 
     // 1. Exchange code
+    const tokenParams = new URLSearchParams({
+      grant_type: "authorization_code",
+      client_id: clientId,
+      client_secret: clientSecret,
+      redirect_uri: redirectUri,
+      code,
+    });
+
     const tokenResponse = await fetch(`${idpUrl}/oauth/token`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
         Accept: "application/json",
       },
-      body: JSON.stringify({
-        grant_type: "authorization_code",
-        client_id: clientId,
-        client_secret: clientSecret,
-        redirect_uri: redirectUri,
-        code,
-      }),
+      body: tokenParams.toString(),
     });
 
     if (!tokenResponse.ok) {

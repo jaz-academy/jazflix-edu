@@ -4,10 +4,16 @@ export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const returnTo = searchParams.get("returnTo") || "/";
 
-  const idpUrl = (process.env.JAZACADEMY_IDP_URL || "http://localhost:8000").replace(/\/$/, "");
-  const clientId = process.env.JAZACADEMY_CLIENT_ID || "5";
-  const redirectUri =
-    process.env.JAZACADEMY_REDIRECT_URI || "http://localhost:3000/api/auth/sso/callback";
+  const host = request.headers.get("x-forwarded-host") || request.headers.get("host") || "localhost:3000";
+  const proto = request.headers.get("x-forwarded-proto") || (host.includes("localhost") ? "http" : "https");
+
+  const idpUrl = (process.env.JAZACADEMY_IDP_URL || "https://jazacademy.id").replace(/\/$/, "");
+  const clientId = process.env.JAZACADEMY_CLIENT_ID || "4";
+
+  let redirectUri = process.env.JAZACADEMY_REDIRECT_URI;
+  if (!redirectUri) {
+    redirectUri = `${proto}://${host}/api/auth/sso/callback`;
+  }
 
   const state = Math.random().toString(36).substring(2, 15);
 
@@ -20,7 +26,7 @@ export async function GET(request) {
 
   const response = NextResponse.redirect(authUrl.toString());
 
-  // Store state and returnTo in cookie for verification
+  // Store state, returnTo, and exact redirectUri in cookie for verification
   response.cookies.set("jaz_oauth_state", state, {
     path: "/",
     httpOnly: true,
@@ -29,6 +35,13 @@ export async function GET(request) {
   });
 
   response.cookies.set("jaz_oauth_return_to", returnTo, {
+    path: "/",
+    httpOnly: true,
+    maxAge: 60 * 10,
+    sameSite: "lax",
+  });
+
+  response.cookies.set("jaz_oauth_redirect_uri", redirectUri, {
     path: "/",
     httpOnly: true,
     maxAge: 60 * 10,
