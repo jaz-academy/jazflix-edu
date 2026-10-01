@@ -54,6 +54,8 @@ export default function TvDetail({
     (e) => e.videoUrl && e.videoUrl.trim()
   );
 
+  const [streamingEp, setStreamingEp] = useState(firstPlayableEp || null);
+
   // Selected Episode (default null -> displays full TV Show; when clicked -> displays episode data)
   const [selectedEpisode, setSelectedEpisode] = useState(null);
   const [loadingEpisodeTrailer, setLoadingEpisodeTrailer] = useState(false);

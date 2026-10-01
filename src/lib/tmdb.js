@@ -314,6 +314,37 @@ export async function getTopRatedMovies(page = 1) {
   return (data.results || []).filter(isSafeMovie).map(formatTmdbMovie);
 }
 
+export async function getTrendingMovies(timeWindow = "week", page = 1) {
+  const data = await tmdbFetch(
+    `/trending/movie/${timeWindow}?page=${page}&include_adult=false&language=en-US`
+  );
+  return (data.results || []).filter(isSafeMovie).map(formatTmdbMovie);
+}
+
+export async function enrichMovieTrailer(movie) {
+  if (!movie) return movie;
+  if (movie.trailerUrl) return movie;
+  const tmdbId = Number(movie.id || movie.movieId);
+  if (!tmdbId || isNaN(tmdbId)) return movie;
+  try {
+    const full = await tmdbFetch(
+      `/movie/${tmdbId}?append_to_response=videos,release_dates&language=en-US`
+    );
+    const trailerUrl = full.videos ? getTrailerUrl(full.videos) : null;
+    return {
+      ...movie,
+      trailerUrl: trailerUrl || movie.trailerUrl || "",
+      bannerImage: movie.bannerImage || getBackdropUrl(full.backdrop_path),
+      posterImage: movie.posterImage || getPosterUrl(full.poster_path),
+      description: movie.description || full.overview || "",
+      rating: movie.rating || (full.vote_average ? Number(full.vote_average).toFixed(1) : "N/A"),
+      releaseYear: movie.releaseYear || (full.release_date ? parseInt(full.release_date.split("-")[0], 10) : null),
+    };
+  } catch (err) {
+    return movie;
+  }
+}
+
 export async function getMovieDetails(id) {
   const data = await tmdbFetch(
     `/movie/${id}?append_to_response=videos,credits,release_dates,recommendations&language=en-US`

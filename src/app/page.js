@@ -4,11 +4,12 @@ import { connectDB } from "@/lib/db";
 import Movie from "@/models/Movie";
 import TvShow from "@/models/TvShow";
 import {
-  getNowPlayingMovies,
+  getTrendingMovies,
   getPopularMovies,
   getTopRatedMovies,
   getUpcomingMovies,
   getTvShowsPaginated,
+  enrichMovieTrailer,
 } from "@/lib/tmdb";
 import { filterBlacklistedMovies, filterBlacklistedTv } from "@/lib/blacklist";
 
@@ -89,7 +90,8 @@ export default async function Home() {
       };
     });
 
-  let nowPlaying = [];
+  let heroMovies = [];
+  let trendingWeekly = [];
   let popular = [];
   let topRated = [];
   let upcoming = [];
@@ -100,16 +102,20 @@ export default async function Home() {
 
   try {
     const [
-      nowPlayingRes,
+      trendingWeeklyRes,
+      trendingWeeklyP2,
       popularRes,
+      popularP2,
       topRatedRes,
       upcomingRes,
       popTvRes,
       topTvRes,
       showTvRes,
     ] = await Promise.all([
-      getNowPlayingMovies(1),
+      getTrendingMovies("week", 1),
+      getTrendingMovies("week", 2),
       getPopularMovies(1),
+      getPopularMovies(2),
       getTopRatedMovies(1),
       getUpcomingMovies(1),
       getTvShowsPaginated({ category: "popular", page: 1 }),
@@ -119,16 +125,20 @@ export default async function Home() {
 
     // Apply blacklist filter to TMDB results
     const [
-      safeNowPlaying,
+      safeTrendingWeekly,
+      safeTrendingP2,
       safePopular,
+      safePopularP2,
       safeTopRated,
       safeUpcoming,
       safePopTv,
       safeTopTv,
       safeShowTv,
     ] = await Promise.all([
-      filterBlacklistedMovies(nowPlayingRes),
+      filterBlacklistedMovies(trendingWeeklyRes),
+      filterBlacklistedMovies(trendingWeeklyP2),
       filterBlacklistedMovies(popularRes),
+      filterBlacklistedMovies(popularP2),
       filterBlacklistedMovies(topRatedRes),
       filterBlacklistedMovies(upcomingRes),
       filterBlacklistedTv(popTvRes.results || []),
@@ -136,20 +146,87 @@ export default async function Home() {
       filterBlacklistedTv(showTvRes.results || []),
     ]);
 
-    nowPlaying = attachMovieHasVideo(safeNowPlaying);
-    popular = attachMovieHasVideo(safePopular);
-    topRated = attachMovieHasVideo(safeTopRated);
-    upcoming = attachMovieHasVideo(safeUpcoming);
+    const trendingWeeklyAttached = attachMovieHasVideo(safeTrendingWeekly);
+    const trendingP2Attached = attachMovieHasVideo(safeTrendingP2);
+    const popularAttached = attachMovieHasVideo(safePopular);
+    const popularP2Attached = attachMovieHasVideo(safePopularP2);
+    const topRatedAttached = attachMovieHasVideo(safeTopRated);
+    const upcomingAttached = attachMovieHasVideo(safeUpcoming);
+
+    trendingWeekly = trendingWeeklyAttached;
+    popular = popularAttached;
+    topRated = topRatedAttached;
+    upcoming = upcomingAttached;
 
     seriesPopular = attachTvHasVideo(safePopTv);
     seriesTopRated = attachTvHasVideo(safeTopTv);
     seriesShowing = attachTvHasVideo(safeShowTv);
+
+    // Kumpulkan 10-20 film dari trending weekly & popular yang sudah ada video di MongoDB
+    const seenHeroIds = new Set();
+    const availableHeroCandidates = [];
+
+    const candidatePool = [
+      ...trendingWeeklyAttached,
+      ...trendingP2Attached,
+      ...popularAttached,
+      ...popularP2Attached,
+    ];
+
+    for (const m of candidatePool) {
+      const idNum = Number(m.id || m.movieId);
+      if (m.hasVideo && !seenHeroIds.has(idNum)) {
+        seenHeroIds.add(idNum);
+        availableHeroCandidates.push(m);
+        if (availableHeroCandidates.length >= 20) break;
+      }
+    }
+
+    // Jika film dengan video dari trending & popular masih kurang dari 10:
+    // Lengkapi dengan film lokal MongoDB lainnya yang memiliki videoUrl
+    if (availableHeroCandidates.length < 10) {
+      const otherLocalWithVideo = localMovies.filter(
+        (m) =>
+          Boolean(m.videoUrl && m.videoUrl.trim()) &&
+          !seenHeroIds.has(Number(m.movieId || m.id || m._id))
+      );
+
+      for (const m of otherLocalWithVideo) {
+        seenHeroIds.add(Number(m.movieId || m.id || m._id));
+        availableHeroCandidates.push({
+          ...m,
+          id: m.movieId || m._id,
+          hasVideo: true,
+        });
+        if (availableHeroCandidates.length >= 20) break;
+      }
+    }
+
+    // Jika koleksi database lokal masih kosong/sangat sedikit (< 5), fallback isi dengan trending weekly teratas
+    if (availableHeroCandidates.length < 5) {
+      for (const m of trendingWeeklyAttached) {
+        const idNum = Number(m.id || m.movieId);
+        if (!seenHeroIds.has(idNum)) {
+          seenHeroIds.add(idNum);
+          availableHeroCandidates.push(m);
+          if (availableHeroCandidates.length >= 10) break;
+        }
+      }
+    }
+
+    // Ambil maksimal 20 film teratas dan pastikan trailer YouTube-nya terisi untuk Hero Banner
+    const rawHeroList = availableHeroCandidates.slice(0, 20);
+    heroMovies = await Promise.all(
+      rawHeroList.map((m) => enrichMovieTrailer(m))
+    );
   } catch (error) {
     console.error("Failed to fetch TMDB data for home page, falling back:", error);
-    nowPlaying = attachMovieHasVideo(localMovies.slice(0, 10));
-    popular = attachMovieHasVideo(localMovies.slice(10, 30));
+    const localWithVideo = localMovies.filter((m) => Boolean(m.videoUrl && m.videoUrl.trim()));
+    heroMovies = attachMovieHasVideo(localWithVideo.slice(0, 15));
+    trendingWeekly = heroMovies;
+    popular = attachMovieHasVideo(localMovies.slice(0, 20));
     topRated = popular;
-    upcoming = nowPlaying;
+    upcoming = popular;
 
     const fallbackTv = attachTvHasVideo(
       localTvWithVideo.map((s) => ({
@@ -209,7 +286,8 @@ export default async function Home() {
       movies={allCollections}
       genres={genres}
       years={years}
-      trending={nowPlaying}
+      trending={heroMovies}
+      trendingWeekly={trendingWeekly}
       populars={popular}
       topRated={topRated}
       upcoming={upcoming}

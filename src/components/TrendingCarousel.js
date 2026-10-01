@@ -60,14 +60,7 @@ export default function TrendingCarousel({ trending = [] }) {
                       width={180}
                       height={112}
                     />
-                    {movie.hasVideo && (
-                      <div
-                        className="absolute top-2 right-2 z-10 w-6 h-6 rounded-md bg-red-600/90 text-white flex items-center justify-center shadow-lg shadow-red-950/60 backdrop-blur-sm border border-red-400/40 pointer-events-none"
-                        title="Tersedia untuk ditonton di Jazflix"
-                      >
-                        <i className="fa-solid fa-play text-[10px]" />
-                      </div>
-                    )}
+
                   </div>
                   <div className="meta-strip rounded-b-xl text-bold text-xs">
                     <span className="text-bold text-gray-300 truncate block">

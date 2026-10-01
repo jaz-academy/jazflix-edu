@@ -90,13 +90,20 @@ function CarouselTrack({ movies = [] }) {
 }
 
 export default function PopularCarousel({
+  trending = [],
   populars = [],
   topRated = [],
   upcoming = [],
 }) {
-  const [activeTab, setActiveTab] = useState("popular");
+  const [activeTab, setActiveTab] = useState("trending");
 
   const tabs = [
+    {
+      id: "trending",
+      label: "Trending",
+      icon: "fa-arrow-trend-up",
+      data: trending,
+    },
     { id: "popular", label: "Popular", icon: "fa-fire", data: populars },
     { id: "top_rated", label: "Top Rated", icon: "fa-star", data: topRated },
     {
@@ -107,7 +114,7 @@ export default function PopularCarousel({
     },
   ];
 
-  const currentMovies = tabs.find((t) => t.id === activeTab)?.data || populars;
+  const currentMovies = tabs.find((t) => t.id === activeTab)?.data || trending || populars;
 
   return (
     <section className="px-6 mt-6">

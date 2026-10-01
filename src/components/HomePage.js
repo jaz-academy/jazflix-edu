@@ -13,6 +13,7 @@ export default function HomePage({
   genres,
   years,
   trending,
+  trendingWeekly = [],
   populars,
   topRated = [],
   upcoming = [],
@@ -28,6 +29,7 @@ export default function HomePage({
       <HeroTrailer trending={trending} />
       <TrendingCarousel trending={trending} />
       <PopularCarousel
+        trending={trendingWeekly}
         populars={populars}
         topRated={topRated}
         upcoming={upcoming}
