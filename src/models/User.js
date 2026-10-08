@@ -23,7 +23,7 @@ const UserSchema = new mongoose.Schema(
       default: "Member", // "Student" | "Teacher" | "Admin" | "Member"
     },
     bio: { type: String, default: "" },
-    skills: { type: [String], default: [] },
+    skills: { type: [mongoose.Schema.Types.Mixed], default: [] },
     favorites: { type: [String], default: [] },
     provider: { type: String, default: "jazacademy" },
     isApproved: { type: Boolean, default: true },
