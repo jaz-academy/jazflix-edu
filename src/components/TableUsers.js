@@ -31,7 +31,8 @@ export default function TableUsers({ users = [] }) {
   };
 
   const handleRemove = async (userId) => {
-    if (!confirm("Yakin ingin menghapus pengguna ini dari database Jazflix?")) return;
+    if (!confirm("Yakin ingin menghapus pengguna ini dari database Jazflix?"))
+      return;
     setLoadingId(userId);
     try {
       const res = await fetch(`/api/users/${userId}`, { method: "DELETE" });
@@ -54,7 +55,12 @@ export default function TableUsers({ users = [] }) {
       const name = (u.name || "").toLowerCase();
       const email = (u.email || "").toLowerCase();
       const username = (u.username || "").toLowerCase();
-      return s === "" || name.includes(s) || email.includes(s) || username.includes(s);
+      return (
+        s === "" ||
+        name.includes(s) ||
+        email.includes(s) ||
+        username.includes(s)
+      );
     });
   }, [search, users]);
 
@@ -67,9 +73,12 @@ export default function TableUsers({ users = [] }) {
     <div className="max-w-6xl mx-auto py-10 px-4 text-white">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Manajemen Pengguna (JazAcademy SSO)</h2>
+          <h2 className="text-2xl font-bold tracking-tight">
+            Manajemen Pengguna
+          </h2>
           <p className="text-xs text-zinc-400 mt-1">
-            Daftar seluruh akun yang terautentikasi dan terdaftar via Single Sign-On jazacademy.id
+            Daftar seluruh akun yang terautentikasi dan terdaftar via Single
+            Sign-On jazacademy.id
           </p>
         </div>
 
@@ -92,17 +101,22 @@ export default function TableUsers({ users = [] }) {
           <thead className="bg-zinc-900/70 text-zinc-400 text-xs uppercase tracking-wider border-b border-zinc-800">
             <tr>
               <th className="px-5 py-3.5">Pengguna</th>
-              <th className="px-5 py-3.5">Email</th>
-              <th className="px-5 py-3.5">ID JazAcademy</th>
-              <th className="px-5 py-3.5">Tipe Member</th>
-              <th className="px-5 py-3.5">Role Jazflix</th>
+              <th className="hidden lg:table-cell px-5 py-3.5">Email</th>
+              <th className="hidden lg:table-cell px-5 py-3.5">
+                ID JazAcademy
+              </th>
+              <th className="hidden lg:table-cell px-5 py-3.5">Tipe Member</th>
+              <th className="hidden md:table-cell px-5 py-3.5">Role Jazflix</th>
               <th className="px-5 py-3.5 text-right">Aksi</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-800/80">
             {paginated.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-5 py-8 text-center text-zinc-500 text-sm">
+                <td
+                  colSpan={6}
+                  className="px-5 py-8 text-center text-zinc-500 text-sm"
+                >
                   Tidak ada pengguna ditemukan.
                 </td>
               </tr>
@@ -129,25 +143,29 @@ export default function TableUsers({ users = [] }) {
                           </div>
                         )}
                         <div>
-                          <div className="font-semibold text-zinc-100">{u.name || "-"}</div>
-                          <div className="text-xs text-zinc-400">@{u.username || "anon"}</div>
+                          <div className="font-semibold text-zinc-100">
+                            {u.name || "-"}
+                          </div>
+                          <div className="text-xs text-zinc-400">
+                            @{u.username || "anon"}
+                          </div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-5 py-3.5 text-zinc-300 font-mono text-xs">
+                    <td className="hidden lg:table-cell px-5 py-3.5 text-zinc-300 font-mono text-xs">
                       {u.email}
                     </td>
-                    <td className="px-5 py-3.5">
+                    <td className="hidden lg:table-cell px-5 py-3.5">
                       <span className="font-mono text-xs px-2 py-0.5 rounded bg-zinc-800/80 text-zinc-300 border border-zinc-700">
                         #{u.jazacademyId || "-"}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5">
+                    <td className="hidden lg:table-cell px-5 py-3.5">
                       <span className="text-xs px-2.5 py-1 rounded-full bg-blue-950/60 text-blue-300 border border-blue-800/60 font-medium">
                         {u.memberType || "Member"}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5">
+                    <td className="hidden md:table-cell px-5 py-3.5">
                       {isSuperadmin ? (
                         <span className="text-xs px-2.5 py-1 rounded-full bg-red-950 text-red-200 border border-red-800 font-bold uppercase tracking-wider">
                           superadmin
@@ -156,7 +174,9 @@ export default function TableUsers({ users = [] }) {
                         <select
                           disabled={loadingId === u._id}
                           value={u.role || "member"}
-                          onChange={(e) => handleRoleChange(u._id, e.target.value)}
+                          onChange={(e) =>
+                            handleRoleChange(u._id, e.target.value)
+                          }
                           className="bg-zinc-900 text-xs border border-zinc-700 rounded-lg px-2.5 py-1 focus:outline-none focus:border-red-500 cursor-pointer disabled:opacity-50"
                         >
                           <option value="member">member</option>
@@ -173,7 +193,12 @@ export default function TableUsers({ users = [] }) {
                           className="text-zinc-500 hover:text-red-400 transition p-1.5 rounded-lg hover:bg-red-950/30 cursor-pointer disabled:opacity-50"
                           title="Hapus Pengguna"
                         >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -195,7 +220,8 @@ export default function TableUsers({ users = [] }) {
       {/* Pagination */}
       <div className="flex justify-between items-center mt-5 text-xs text-zinc-400">
         <div>
-          Menampilkan {paginated.length > 0 ? start + 1 : 0} - {Math.min(start + perPage, total)} dari {total} pengguna
+          {paginated.length > 0 ? start + 1 : 0} -{" "}
+          {Math.min(start + perPage, total)} dari {total}
         </div>
         <div className="flex items-center gap-2">
           <button

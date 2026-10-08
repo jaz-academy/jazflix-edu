@@ -17,7 +17,7 @@ export default async function AdminEdit({ params }) {
   return (
     <>
       <Navbar />
-      <div className="my-20" />
+      <div className="my-2" />
       <EditMovieForm id={id} genres={genres} />
     </>
   );

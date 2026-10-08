@@ -11,12 +11,14 @@ async function getTvShows() {
 
 export default async function AdminTvPage() {
   const tvShows = await getTvShows();
-  const years = [...new Set(tvShows.map((t) => t.releaseYear).filter(Boolean))].sort().reverse();
+  const years = [...new Set(tvShows.map((t) => t.releaseYear).filter(Boolean))]
+    .sort()
+    .reverse();
 
   return (
     <div className="min-h-screen bg-black text-white">
       <Navbar />
-      <div className="pt-20 pb-12">
+      <div className="pt-8 pb-12">
         <TableTvShows tvShows={tvShows} years={years} />
       </div>
     </div>

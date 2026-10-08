@@ -158,7 +158,7 @@ export default function TableMovies({ movies = [], genres = [], years = [] }) {
           href="/admin/add"
           className="px-6 py-2 bg-red-600 text-white font-semibold rounded-md hover:bg-red-700"
         >
-          + Add Movie
+          Add <span className="hidden sm:inline">New Movie</span>
         </Link>
       </div>
 
@@ -192,7 +192,7 @@ export default function TableMovies({ movies = [], genres = [], years = [] }) {
               >
                 Rating
               </th>
-              <th className="px-4 py-3 hidden md:table-cell">Video</th>
+              <th className="px-4 py-3 hidden lg:table-cell">Video</th>
               <th className="p-3 text-right">Actions</th>
             </tr>
           </thead>
@@ -205,7 +205,11 @@ export default function TableMovies({ movies = [], genres = [], years = [] }) {
                 <td className="px-4 py-3">
                   <div className="w-16 h-20 relative rounded-lg overflow-hidden bg-zinc-900">
                     <Image
-                      src={movie.posterImage || movie.bannerImage || "/images/no-photo.png"}
+                      src={
+                        movie.posterImage ||
+                        movie.bannerImage ||
+                        "/images/no-photo.png"
+                      }
                       alt={movie.title || "Poster"}
                       width={64}
                       height={80}
@@ -214,8 +218,12 @@ export default function TableMovies({ movies = [], genres = [], years = [] }) {
                   </div>
                 </td>
                 <td className="px-4 py-3 max-w-[220px]">
-                  <div className="font-semibold text-white truncate">{movie.title}</div>
-                  <div className="text-xs text-zinc-400 truncate">{movie.originalTitle}</div>
+                  <div className="font-semibold text-white truncate">
+                    {movie.title}
+                  </div>
+                  <div className="text-xs text-zinc-400 truncate">
+                    {movie.originalTitle}
+                  </div>
                   {movie.movieId ? (
                     <a
                       href={`https://www.themoviedb.org/movie/${movie.movieId}`}
@@ -241,7 +249,7 @@ export default function TableMovies({ movies = [], genres = [], years = [] }) {
                     <span>{movie.rating || "N/A"}</span>
                   </span>
                 </td>
-                <td className="px-4 py-3 hidden md:table-cell">
+                <td className="px-4 py-3 hidden lg:table-cell">
                   {movie.videoUrl ? (
                     <span className="px-2 py-0.5 text-xs rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800 flex items-center gap-1 w-fit">
                       <i className="fa-solid fa-check text-[10px]" /> Ada
@@ -270,7 +278,7 @@ export default function TableMovies({ movies = [], genres = [], years = [] }) {
                   </Link>
                   <button
                     onClick={() => remove(movie._id)}
-                    className="text-red-500 text-lg cursor-pointer hover:text-red-400"
+                    className="text-red-500 text-lg mr-3 cursor-pointer hover:text-red-400"
                     title="Delete movie"
                   >
                     <i className="fa-solid fa-trash" />

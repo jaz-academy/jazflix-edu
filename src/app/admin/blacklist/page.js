@@ -6,7 +6,8 @@ import BlacklistManager from "@/components/BlacklistManager";
 
 export const metadata = {
   title: "Manajemen Blacklist - Superadmin Jazflix",
-  description: "Kelola konten terlarang / disembunyikan untuk Film, Series, dan Artis",
+  description:
+    "Kelola konten terlarang / disembunyikan untuk Film, Series, dan Artis",
 };
 
 export default async function AdminBlacklistPage() {
@@ -32,7 +33,7 @@ export default async function AdminBlacklistPage() {
   return (
     <div className="min-h-screen bg-black text-white">
       <Navbar />
-      <div className="pt-24 pb-16">
+      <div className="pt-18 pb-16">
         <BlacklistManager currentUser={user} />
       </div>
     </div>

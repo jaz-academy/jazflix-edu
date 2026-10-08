@@ -38,7 +38,9 @@ export default function EditTvShowForm({ initialTvShow }) {
     }
     setLoadingSeason(true);
     try {
-      const res = await fetch(`/api/tmdb/tv/${initialTvShow.tvId}/season/${sNum}`);
+      const res = await fetch(
+        `/api/tmdb/tv/${initialTvShow.tvId}/season/${sNum}`,
+      );
       const data = await res.json();
       const fetched = (data.episodes || []).map((ep) => ({
         seasonNumber: sNum,
@@ -72,7 +74,7 @@ export default function EditTvShowForm({ initialTvShow }) {
     setSeasonEpisodes((prev) => {
       const list = prev[sNum] || [];
       const updated = list.map((ep) =>
-        ep.episodeNumber === epNum ? { ...ep, videoUrl: url } : ep
+        ep.episodeNumber === epNum ? { ...ep, videoUrl: url } : ep,
       );
       return { ...prev, [sNum]: updated };
     });
@@ -130,7 +132,7 @@ export default function EditTvShowForm({ initialTvShow }) {
   return (
     <div className="max-w-6xl mx-auto py-10 px-4 text-white">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-zinc-800 pb-5 mb-8">
+      <div className="flex items-center justify-between border-b border-zinc-800 pb-5 my-8">
         <div>
           <div className="flex items-center gap-2 text-xs text-zinc-400 mb-1">
             <Link href="/admin/tv" className="hover:text-white transition">
@@ -139,19 +141,7 @@ export default function EditTvShowForm({ initialTvShow }) {
             <i className="fa-solid fa-chevron-right text-[10px]" />
             <span className="text-zinc-200">Kelola Episode</span>
           </div>
-          <h1 className="text-2xl font-bold flex items-center gap-2.5">
-            <i className="fa-solid fa-pen-to-square text-amber-500" />
-            <span>Kelola Episode: {initialTvShow.title}</span>
-          </h1>
         </div>
-
-        <Link
-          href="/admin/tv"
-          className="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-semibold transition flex items-center gap-2"
-        >
-          <i className="fa-solid fa-arrow-left" />
-          <span>Kembali ke Daftar</span>
-        </Link>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -222,7 +212,7 @@ export default function EditTvShowForm({ initialTvShow }) {
               >
                 {seasonsArray.map((sNum) => {
                   const count = (seasonEpisodes[sNum] || []).filter(
-                    (e) => e.videoUrl && e.videoUrl.trim()
+                    (e) => e.videoUrl && e.videoUrl.trim(),
                   ).length;
                   return (
                     <option key={sNum} value={sNum}>
@@ -290,7 +280,7 @@ export default function EditTvShowForm({ initialTvShow }) {
                           handleVideoUrlChange(
                             activeSeason,
                             ep.episodeNumber,
-                            e.target.value
+                            e.target.value,
                           )
                         }
                         placeholder="Paste Google Drive URL / MP4 / Embed link..."
@@ -347,7 +337,7 @@ export default function EditTvShowForm({ initialTvShow }) {
             ) : (
               <>
                 <i className="fa-solid fa-check" />
-                <span>Simpan Perubahan Episode</span>
+                <span>Simpan</span>
               </>
             )}
           </button>

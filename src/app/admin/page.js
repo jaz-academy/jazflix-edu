@@ -17,7 +17,7 @@ export default async function Admin() {
   return (
     <>
       <Navbar />
-      <div className="my-20" />
+      <div className="my-8" />
       <TableMovies movies={movies} genres={genres} years={years} />
     </>
   );

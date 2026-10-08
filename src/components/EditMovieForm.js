@@ -160,22 +160,17 @@ export default function EditMovieForm({ id, genres = [] }) {
 
   return (
     <div className="max-w-6xl mx-auto py-8 px-4 text-white">
-      <div className="flex items-center justify-between mb-8">
+      {/* Header */}
+      <div className="flex items-center justify-between border-b border-zinc-800 pb-5 my-8">
         <div>
-          <h1 className="text-3xl font-bold text-red-500 flex items-center gap-2">
-            <i className="fa-solid fa-pen-to-square" /> Edit Film: {movie.title}
-          </h1>
-          <p className="text-zinc-400 text-sm mt-1">
-            Edit informasi film, sinkronkan ulang dengan TMDB, dan pastikan link
-            video terisi.
-          </p>
+          <div className="flex items-center gap-2 text-xs text-zinc-400 mb-1">
+            <Link href="/admin" className="hover:text-white transition">
+              Kelola Film
+            </Link>
+            <i className="fa-solid fa-chevron-right text-[10px]" />
+            <span className="text-zinc-200">Edit Film</span>
+          </div>
         </div>
-        <Link
-          href="/admin"
-          className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-lg text-sm transition"
-        >
-          <i className="fa-solid fa-arrow-left mr-1" /> Kembali
-        </Link>
       </div>
 
       {/* TMDB Re-sync & Search Tool */}
@@ -498,27 +493,19 @@ export default function EditMovieForm({ id, genres = [] }) {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-600/20 hover:bg-red-600/30 text-red-300 hover:text-red-200 border border-red-500/40 text-xs font-medium transition cursor-pointer"
                   >
-                    <i className="fa-solid fa-arrow-up-right-from-square" /> Uji di Tab Baru
+                    <i className="fa-solid fa-arrow-up-right-from-square" /> Uji
+                    di Tab Baru
                   </a>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      navigator.clipboard.writeText(movie.videoUrl);
-                      setCopied(true);
-                      setTimeout(() => setCopied(false), 2000);
-                    }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white border border-zinc-700 text-xs font-medium transition cursor-pointer"
-                  >
-                    <i className={`fa-solid ${copied ? "fa-check text-green-400" : "fa-copy"}`} />
-                    {copied ? "Link Disalin!" : "Salin Link (Untuk Jendela Penyamaran / Incognito)"}
-                  </button>
                 </div>
               )}
 
               <p className="text-[11px] text-zinc-400 mt-2.5 flex items-start gap-1.5">
                 <i className="fa-solid fa-circle-info text-zinc-500 mt-0.5 flex-shrink-0" />
                 <span>
-                  <strong>Tips Uji Akses Publik:</strong> Buka link di jendela <em>Incognito / Private Window</em> (<code>Ctrl+Shift+N</code>). Jika video dapat diputar langsung tanpa permintaan login akun Google, link sudah valid &amp; publik.
+                  <strong>Tips Uji Akses Publik:</strong> Buka link di jendela{" "}
+                  <em>Incognito / Private Window</em> (<code>Ctrl+Shift+N</code>
+                  ). Jika video dapat diputar langsung tanpa permintaan login
+                  akun Google, link sudah valid &amp; publik.
                 </span>
               </p>
             </div>

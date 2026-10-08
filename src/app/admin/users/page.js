@@ -15,7 +15,7 @@ export default async function AdminUsers() {
   return (
     <>
       <Navbar />
-      <div className="my-20" />
+      <div className="my-8" />
       <TableUsers users={users} />
     </>
   );

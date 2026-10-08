@@ -104,7 +104,6 @@ export default function PopularCarousel({
       icon: "fa-arrow-trend-up",
       data: trending,
     },
-    { id: "popular", label: "Popular", icon: "fa-fire", data: populars },
     { id: "top_rated", label: "Top Rated", icon: "fa-star", data: topRated },
     {
       id: "upcoming",
@@ -114,7 +113,8 @@ export default function PopularCarousel({
     },
   ];
 
-  const currentMovies = tabs.find((t) => t.id === activeTab)?.data || trending || populars;
+  const currentMovies =
+    tabs.find((t) => t.id === activeTab)?.data || trending || populars;
 
   return (
     <section className="px-6 mt-6">

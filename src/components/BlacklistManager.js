@@ -54,7 +54,9 @@ export default function BlacklistManager({ currentUser }) {
         mediaType: activeTab,
         query: searchQuery,
       });
-      const res = await fetch(`/api/admin/blacklist/search-tmdb?${params.toString()}`);
+      const res = await fetch(
+        `/api/admin/blacklist/search-tmdb?${params.toString()}`,
+      );
       if (res.ok) {
         const data = await res.json();
         setItems(data.results || []);
@@ -95,12 +97,14 @@ export default function BlacklistManager({ currentUser }) {
       });
       if (res.ok) {
         setItems((prev) =>
-          prev.map((i) => (String(i._id) === idKey ? { ...i, isActive: newStatus } : i))
+          prev.map((i) =>
+            String(i._id) === idKey ? { ...i, isActive: newStatus } : i,
+          ),
         );
         showToast(
           newStatus
             ? "Status diubah: Konten sekarang disembunyikan!"
-            : "Status diubah: Konten sekarang diizinkan tampil."
+            : "Status diubah: Konten sekarang diizinkan tampil.",
         );
       } else {
         showToast("Gagal memperbarui status", "error");
@@ -125,7 +129,9 @@ export default function BlacklistManager({ currentUser }) {
       });
       if (res.ok) {
         setItems((prev) =>
-          prev.map((i) => (String(i._id) === idKey ? { ...i, reason: reasonText } : i))
+          prev.map((i) =>
+            String(i._id) === idKey ? { ...i, reason: reasonText } : i,
+          ),
         );
         showToast("Alasan blacklist berhasil disimpan!");
       } else {
@@ -196,13 +202,13 @@ export default function BlacklistManager({ currentUser }) {
                   isActive: nextActive,
                   reason: reasonText,
                 }
-              : i
-          )
+              : i,
+          ),
         );
         showToast(
           nextActive
             ? "Konten berhasil dimasukkan ke daftar blacklist (disembunyikan)!"
-            : "Status diubah: Konten diizinkan tampil."
+            : "Status diubah: Konten diizinkan tampil.",
         );
       } else {
         showToast("Gagal menyimpan ke blacklist", "error");
@@ -240,8 +246,10 @@ export default function BlacklistManager({ currentUser }) {
       if (res.ok) {
         setItems((prev) =>
           prev.map((i) =>
-            String(i.id) === idKey ? { ...i, isBlacklisted: true, reason: reasonText } : i
-          )
+            String(i.id) === idKey
+              ? { ...i, isBlacklisted: true, reason: reasonText }
+              : i,
+          ),
         );
         showToast("Alasan blacklist berhasil disimpan!");
       } else {
@@ -273,7 +281,9 @@ export default function BlacklistManager({ currentUser }) {
         >
           <i
             className={`fa-solid ${
-              toast.type === "error" ? "fa-circle-exclamation text-red-400" : "fa-circle-check text-emerald-400"
+              toast.type === "error"
+                ? "fa-circle-exclamation text-red-400"
+                : "fa-circle-check text-emerald-400"
             }`}
           />
           <span className="text-sm font-medium">{toast.message}</span>
@@ -286,16 +296,9 @@ export default function BlacklistManager({ currentUser }) {
           <div className="flex items-center gap-3 mb-2">
             <h1 className="text-2xl md:text-3xl font-black tracking-tight text-white flex items-center gap-2.5">
               <i className="fa-solid fa-ban text-red-500" />
-              <span>Manajemen Filter Blacklist</span>
+              <span>Manajemen Filter</span>
             </h1>
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase tracking-wider">
-              Khusus Superadmin
-            </span>
           </div>
-          <p className="text-sm text-zinc-400 max-w-2xl">
-            Sembunyikan film, serial, atau artis dari seluruh halaman publik dan hasil pencarian Jazflix.
-            Konten yang diblacklist tidak akan muncul di katalog, homepage, detail, maupun pemutar video.
-          </p>
         </div>
 
         {/* View Mode Switcher */}
@@ -309,7 +312,7 @@ export default function BlacklistManager({ currentUser }) {
             }`}
           >
             <i className="fa-solid fa-list-check" />
-            <span>Daftar Ter-blacklist</span>
+            <span>Blacklist</span>
           </button>
           <button
             onClick={() => setViewMode("tmdb")}
@@ -392,7 +395,9 @@ export default function BlacklistManager({ currentUser }) {
         <div className="bg-zinc-900/60 border border-zinc-800/80 rounded-2xl p-12 text-center flex flex-col items-center justify-center">
           <i className="fa-solid fa-folder-open text-4xl text-zinc-600 mb-3" />
           <h3 className="text-base font-bold text-white mb-1">
-            {viewMode === "blacklist" ? "Tidak ada konten diblacklist" : "Tidak ada hasil pencarian"}
+            {viewMode === "blacklist"
+              ? "Tidak ada konten diblacklist"
+              : "Tidak ada hasil pencarian"}
           </h3>
           <p className="text-xs text-zinc-400 max-w-md">
             {viewMode === "blacklist"
@@ -407,10 +412,12 @@ export default function BlacklistManager({ currentUser }) {
               <thead className="bg-zinc-900/90 text-xs font-semibold uppercase text-zinc-400 border-b border-zinc-800">
                 <tr>
                   <th className="px-5 py-3.5 w-16">Media</th>
-                  <th className="px-5 py-3.5">Judul / Nama & Info</th>
-                  <th className="px-5 py-3.5 w-48 text-center">Jangan Tampilkan</th>
-                  <th className="px-5 py-3.5">Alasan Blacklist</th>
-                  <th className="px-5 py-3.5 w-28 text-center">Aksi</th>
+                  <th className="px-5 py-3.5">Judul</th>
+                  <th className="px-5 py-3.5 w-48 text-center">Opsi</th>
+                  <th className="hidden lg:table-cell px-5 py-3.5">Alasan</th>
+                  <th className="hidden lg:table-cell px-5 py-3.5 w-28 text-center">
+                    Aksi
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-800/60">
@@ -420,8 +427,11 @@ export default function BlacklistManager({ currentUser }) {
                   const itemId = String(idRaw || item.tmdbId || idx);
                   const rowKey = `${isDbMode ? "db" : "tmdb"}-${activeTab}-${itemId}-${idx}`;
                   const isUpdating = updatingId === itemId;
-                  const isActive = isDbMode ? item.isActive : Boolean(item.isActive);
-                  const reasonValue = editingReasons[itemId] ?? item.reason ?? "";
+                  const isActive = isDbMode
+                    ? item.isActive
+                    : Boolean(item.isActive);
+                  const reasonValue =
+                    editingReasons[itemId] ?? item.reason ?? "";
 
                   const posterUrl = isDbMode
                     ? item.posterPath || "/images/no-photo.png"
@@ -453,26 +463,34 @@ export default function BlacklistManager({ currentUser }) {
                         <div className="font-bold text-white text-base leading-snug flex items-center gap-2">
                           <span>{item.title}</span>
                           {isActive && (
-                            <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-red-600/20 text-red-400 border border-red-500/30">
-                              Ter-blacklist
+                            <span className="hidden lg:inline px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-red-600/20 text-red-400 border border-red-500/30">
+                              Blacklist
                             </span>
                           )}
                         </div>
-                        {item.originalTitle && item.originalTitle !== item.title && (
-                          <p className="text-xs text-zinc-500 italic mb-1">
-                            {item.originalTitle}
-                          </p>
-                        )}
-                        <div className="flex items-center gap-3 text-xs text-zinc-400 mt-1">
-                          {item.releaseYear && <span>Tahun: {item.releaseYear}</span>}
-                          {item.department && <span>Profesi: {item.department}</span>}
+                        {item.originalTitle &&
+                          item.originalTitle !== item.title && (
+                            <p className="text-xs text-zinc-500 italic mb-1">
+                              {item.originalTitle}
+                            </p>
+                          )}
+                        <div className="hidden lg:flex items-center gap-3 text-xs text-zinc-400 mt-1">
+                          {item.releaseYear && (
+                            <span>Tahun: {item.releaseYear}</span>
+                          )}
+                          {item.department && (
+                            <span>Profesi: {item.department}</span>
+                          )}
                           <span className="text-zinc-500">
                             TMDB ID: #{isDbMode ? item.tmdbId : item.id}
                           </span>
                         </div>
                         {isDbMode && item.blacklistedBy?.name && (
-                          <p className="text-[11px] text-zinc-500 mt-1">
-                            Oleh: <strong className="text-zinc-400">{item.blacklistedBy.name}</strong>
+                          <p className="hidden lg:block text-[11px] text-zinc-500 mt-1">
+                            Oleh:{" "}
+                            <strong className="text-zinc-400">
+                              {item.blacklistedBy.name}
+                            </strong>
                           </p>
                         )}
                       </td>
@@ -507,7 +525,7 @@ export default function BlacklistManager({ currentUser }) {
                       </td>
 
                       {/* Reason Input */}
-                      <td className="px-5 py-4 align-top">
+                      <td className="hidden lg:table-cell px-5 py-4 align-top">
                         <div className="flex flex-col gap-1.5 max-w-sm">
                           <textarea
                             rows={2}
@@ -539,7 +557,7 @@ export default function BlacklistManager({ currentUser }) {
                       </td>
 
                       {/* Actions */}
-                      <td className="px-5 py-4 align-top text-center">
+                      <td className="hidden lg:table-cell px-5 py-4 align-top text-center">
                         {isDbMode ? (
                           <button
                             onClick={() => handleDeleteBlacklist(item)}

@@ -90,7 +90,7 @@ export default function TableTvShows({ tvShows = [], years = [] }) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2.5">
-            <span>Kelola Serial TV (Episode & Video)</span>
+            <span>Kelola Serial TV</span>
           </h2>
           <p className="text-zinc-400 text-xs mt-1">
             Daftarkan serial dari TMDB dan kelola link video streaming untuk
@@ -103,13 +103,13 @@ export default function TableTvShows({ tvShows = [], years = [] }) {
           className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl shadow-lg transition flex items-center gap-2 self-start sm:self-auto cursor-pointer"
         >
           <i className="fa-solid fa-plus" />
-          <span>Tambah Serial TV</span>
+          Tambah <span className="hidden lg:inline">Video per Episode</span>
         </Link>
       </div>
 
       {/* Filter Bar */}
       <div className="flex flex-wrap items-center gap-3 mb-6">
-        <div className="relative flex-1 min-w-[200px]">
+        <div className="hidden sm:block relative flex-1 min-w-[200px]">
           <input
             type="text"
             placeholder="Cari judul serial..."

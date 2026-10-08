@@ -111,7 +111,7 @@ export default function Navbar({ onSearch }) {
                       : "text-zinc-300 hover:text-white"
                   }`}
                 >
-                  Kelola Film
+                  Film
                 </Link>
                 <Link
                   href="/admin/tv"
@@ -121,7 +121,7 @@ export default function Navbar({ onSearch }) {
                       : "text-zinc-300 hover:text-white"
                   }`}
                 >
-                  Kelola Series
+                  Series
                 </Link>
                 <Link
                   href="/admin/users"
@@ -142,7 +142,7 @@ export default function Navbar({ onSearch }) {
                         : "text-zinc-300 hover:text-white"
                     }`}
                   >
-                    Blacklist
+                    List
                   </Link>
                 )}
               </div>

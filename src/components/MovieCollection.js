@@ -25,7 +25,9 @@ export default function MovieCollection({ movies, genres, years, keyword }) {
           Array.isArray(genres) && genres.length === 0 ? "hidden" : ""
         }`}
       >
-        <h2 className="text-2xl font-bold">Our Collections</h2>
+        <h2 className="text-2xl font-bold">
+          <span className="hidden md:inline">Our</span> Collections
+        </h2>
 
         <div>
           <select
@@ -58,7 +60,9 @@ export default function MovieCollection({ movies, genres, years, keyword }) {
         {filtered.map((m, i) => {
           const mId = m.movieId || m.tvId || m.id || m._id;
           const posterUrl = m.posterImage || "/images/no-photo.png";
-          const href = m.isSeries ? `/tv/${m.tvId || m.id || mId}` : `/movie/${mId}`;
+          const href = m.isSeries
+            ? `/tv/${m.tvId || m.id || mId}`
+            : `/movie/${mId}`;
           return (
             <div
               key={m._id || i}
