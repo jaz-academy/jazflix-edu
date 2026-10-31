@@ -17,11 +17,14 @@ function formatTime(seconds) {
 
 function extractDriveId(url) {
   if (!url) return null;
+  if (/^[a-zA-Z0-9_-]{25,50}$/.test(url.trim())) {
+    return url.trim();
+  }
   const patterns = [
-    /\/d\/([^/]+)/,
-    /id=([^&]+)/,
+    /\/d\/([^/?]+)/,
+    /id=([^&/?]+)/,
     /\/file\/([^/?]+)/,
-    /\/open\?id=([^&]+)/,
+    /\/open\?id=([^&/?]+)/,
   ];
   for (const p of patterns) {
     const match = url.match(p);
@@ -49,6 +52,11 @@ export default function CleanVideoPlayer({
   const streamSrc = isDrive && driveId
     ? `/api/stream/gdrive?fileId=${driveId}`
     : videoUrl;
+
+  // Direct download / Google Drive web view URL
+  const downloadUrl = isDrive && driveId
+    ? `https://drive.google.com/file/d/${driveId}/view`
+    : videoUrl || null;
 
   // Player mode: 'clean' (default HTML5 Jazflix player) or 'embed' (Drive iframe fallback)
   const [playerMode, setPlayerMode] = useState("clean");
@@ -296,25 +304,36 @@ export default function CleanVideoPlayer({
       {playerMode === "embed" ? (
         <div className="w-full h-full relative">
           {/* Header Switcher Bar */}
-          <div className="absolute top-4 left-4 right-4 z-50 flex items-center justify-between">
+          <div className="absolute top-4 left-4 right-4 z-50 flex items-center justify-between gap-2">
             <Link
               href={backUrl}
-              className="px-3.5 py-2 bg-black/80 hover:bg-black text-white rounded-xl text-xs backdrop-blur-md flex items-center gap-2 border border-zinc-800 transition"
+              className="px-3.5 py-2 bg-black/80 hover:bg-black text-white rounded-xl text-xs backdrop-blur-md flex items-center gap-2 border border-zinc-800 transition flex-shrink-0"
             >
               <i className="fa-solid fa-arrow-left" />
               <span>Kembali</span>
             </Link>
 
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-zinc-400 bg-black/70 px-3 py-1.5 rounded-lg border border-zinc-800 hidden sm:inline-block">
-                Mode: Embed Google Drive
-              </span>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {downloadUrl && (
+                <a
+                  href={downloadUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download={!isDrive}
+                  className="px-3.5 py-2 bg-black/80 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-xl text-xs backdrop-blur-md flex items-center gap-1.5 border border-zinc-800 transition shadow-sm"
+                  title={isDrive ? "Buka file di Google Drive / Download di tab baru" : "Download Video"}
+                >
+                  <i className="fa-solid fa-download text-[11px] text-emerald-400" />
+                  <span>Download</span>
+                </a>
+              )}
               <button
                 onClick={() => setPlayerMode("clean")}
-                className="px-3.5 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-lg shadow-red-950/60 cursor-pointer"
+                className="px-3.5 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-lg shadow-red-950/60 cursor-pointer"
+                title="Ganti ke Jazflix Player"
               >
                 <i className="fa-solid fa-play text-[10px]" />
-                <span>Gunakan Pemutar Jazflix</span>
+                <span>Player</span>
               </button>
             </div>
           </div>
@@ -368,14 +387,25 @@ export default function CleanVideoPlayer({
               <p className="text-xs text-zinc-400 max-w-md mb-6 leading-relaxed">
                 Server Google Drive membatasi akses streaming langsung untuk file ini. Anda dapat tetap menonton film menggunakan Mode Embed Google Drive.
               </p>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center justify-center gap-3">
                 <button
                   onClick={() => setPlayerMode("embed")}
                   className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-lg shadow-red-950/60 transition cursor-pointer flex items-center gap-2"
                 >
                   <i className="fa-solid fa-play" />
-                  <span>Buka Mode Embed Drive</span>
+                  <span>Buka Mode Embed</span>
                 </button>
+                {downloadUrl && (
+                  <a
+                    href={downloadUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white text-xs font-semibold transition flex items-center gap-2"
+                  >
+                    <i className="fa-solid fa-download text-emerald-400" />
+                    <span>Download / Buka Drive</span>
+                  </a>
+                )}
                 <Link
                   href={backUrl}
                   className="px-4 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-semibold transition"
@@ -400,11 +430,11 @@ export default function CleanVideoPlayer({
 
           {/* Top Bar Overlay */}
           <div
-            className={`absolute top-0 left-0 right-0 p-4 sm:p-6 bg-gradient-to-b from-black/90 via-black/40 to-transparent z-30 transition-opacity duration-300 flex items-center justify-between ${
+            className={`absolute top-0 left-0 right-0 p-4 sm:p-6 bg-gradient-to-b from-black/90 via-black/40 to-transparent z-30 transition-opacity duration-300 flex items-center justify-between gap-3 ${
               showControls ? "opacity-100" : "opacity-0 pointer-events-none"
             }`}
           >
-            <div className="flex items-center gap-3 truncate max-w-xl">
+            <div className="flex items-center gap-3 min-w-0 mr-2">
               <Link
                 href={backUrl}
                 className="px-3 py-1.5 rounded-xl bg-black/60 hover:bg-zinc-800 text-white text-xs border border-zinc-700/60 backdrop-blur-md flex items-center gap-2 transition flex-shrink-0 cursor-pointer"
@@ -412,7 +442,7 @@ export default function CleanVideoPlayer({
                 <i className="fa-solid fa-arrow-left text-[11px]" />
                 <span className="hidden sm:inline">Kembali</span>
               </Link>
-              <div className="truncate">
+              <div className="min-w-0">
                 <h1 className="text-sm sm:text-base font-bold text-white truncate leading-tight">
                   {title}
                 </h1>
@@ -422,19 +452,33 @@ export default function CleanVideoPlayer({
               </div>
             </div>
 
-            {/* Switch to Drive Embed Button */}
-            {isDrive && (
-              <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Action buttons: Download & Embed Switch */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {downloadUrl && (
+                <a
+                  href={downloadUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download={!isDrive}
+                  className="px-3 py-1.5 rounded-xl bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 hover:text-white text-xs border border-zinc-700/60 backdrop-blur-md transition cursor-pointer flex items-center gap-1.5 shadow-sm"
+                  title={isDrive ? "Buka file di Google Drive / Download di tab baru" : "Download Video"}
+                >
+                  <i className="fa-solid fa-download text-[11px] text-emerald-400" />
+                  <span>Download</span>
+                </a>
+              )}
+
+              {isDrive && (
                 <button
                   onClick={() => setPlayerMode("embed")}
                   className="px-3 py-1.5 rounded-xl bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 hover:text-white text-xs border border-zinc-700/60 backdrop-blur-md transition cursor-pointer flex items-center gap-1.5"
-                  title="Jika mengalami kendala, beralih ke iframe Google Drive bawaan"
+                  title="Ganti ke Mode Embed Google Drive"
                 >
                   <i className="fa-brands fa-google-drive text-[11px] text-yellow-400" />
-                  <span className="hidden md:inline">Mode Embed</span>
+                  <span>Embed</span>
                 </button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
 
           {/* Bottom Player Controls Overlay */}
@@ -566,6 +610,20 @@ export default function CleanVideoPlayer({
                     </div>
                   )}
                 </div>
+
+                {/* Download Button */}
+                {downloadUrl && (
+                  <a
+                    href={downloadUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download={!isDrive}
+                    className="w-8 h-8 rounded-lg hover:bg-white/10 flex items-center justify-center transition cursor-pointer text-zinc-300 hover:text-white"
+                    title={isDrive ? "Buka file di Google Drive / Download di tab baru" : "Download Video"}
+                  >
+                    <i className="fa-solid fa-download text-xs" />
+                  </a>
+                )}
 
                 {/* Picture in Picture */}
                 <button
