@@ -46,7 +46,7 @@ export default function MovieDetail({ movie, hasVideo = false }) {
 
         <div className="flex flex-col justify-between">
           <div className="space-y-4">
-            <h1 className="text-3xl font-bold">{movie.title}</h1>
+            <h1 className="text-2xl font-bold">{movie.title}</h1>
             <div className="flex items-center gap-3 text-xs text-yellow-400 font-semibold">
               <span className="flex items-center gap-1">
                 <i className="fa-solid fa-star text-[10px]" />
@@ -121,7 +121,7 @@ export default function MovieDetail({ movie, hasVideo = false }) {
             </Link>
           ) : (
             <div className="w-full bg-zinc-800/60 border border-zinc-700/60 text-zinc-400 py-3 rounded-xl text-center text-xs mt-4 flex items-center justify-center gap-2">
-              <i className="fa-solid fa-circle-info"></i> Belum tersedia untuk streaming di Jazflix
+              <i className="fa-solid fa-circle-info"></i> Belum tersedia di Jazflix
             </div>
           )}
         </div>

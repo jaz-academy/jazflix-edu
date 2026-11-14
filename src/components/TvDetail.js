@@ -180,7 +180,7 @@ export default function TvDetail({
         {/* Left 2 Cols: Media Viewport (Stream Player / Trailer) */}
         <div className="md:col-span-2 flex flex-col justify-between space-y-3">
           {/* Menu View Switcher Bar */}
-          <div className="flex items-center justify-between">
+          <div className="hidden lg:flex items-center justify-between">
             <div className="flex items-center gap-2">
               {hasDbVideo && streamingEp && (
                 <button
@@ -242,7 +242,7 @@ export default function TvDetail({
           </div>
 
           {/* Video Player Container */}
-          <div className="rounded-2xl overflow-hidden shadow-2xl bg-zinc-900 relative min-h-[350px] md:min-h-[480px] border border-zinc-800 flex-1">
+          <div className="rounded-2xl overflow-hidden shadow-2xl bg-zinc-900 relative min-h-[350px] border border-zinc-800 flex-1">
             {loadingEpisodeTrailer && (
               <div className="absolute inset-0 bg-black/80 z-20 flex items-center justify-center text-white backdrop-blur-sm">
                 <i className="fa-solid fa-spinner fa-spin text-3xl text-red-500" />
@@ -252,7 +252,7 @@ export default function TvDetail({
             {viewMode === "stream" && streamingEp?.videoUrl ? (
               <iframe
                 key={`stream-${streamingEp.seasonNumber}-${streamingEp.episodeNumber}`}
-                className="w-full h-full min-h-[350px] md:min-h-[480px]"
+                className="w-full h-full object-cover"
                 src={getEmbedUrl(streamingEp.videoUrl)}
                 allow="autoplay; fullscreen"
                 allowFullScreen
@@ -307,13 +307,13 @@ export default function TvDetail({
                   {selectedEpisode && (
                     <button
                       onClick={resetToTvShow}
-                      className="text-[10px] text-zinc-400 hover:text-white px-2 py-0.5 rounded bg-zinc-800 transition cursor-pointer"
+                      className="hidden lg-inline text-[10px] text-zinc-400 hover:text-white px-2 py-0.5 rounded bg-zinc-800 transition cursor-pointer"
                     >
                       Kembali ke Serial
                     </button>
                   )}
                 </div>
-                <h1 className="text-2xl font-black text-white leading-tight">
+                <h1 className="text-xl font-black text-white leading-tight">
                   {selectedEpisode
                     ? `${selectedEpisode.episodeNumber}. ${selectedEpisode.name}`
                     : tv.title}
@@ -328,7 +328,7 @@ export default function TvDetail({
               {/* Rating Badge */}
               {(selectedEpisode ? selectedEpisode.rating : tv.rating) &&
                 (selectedEpisode ? selectedEpisode.rating : tv.rating) !== "N/A" && (
-                  <div className="px-3 py-1.5 rounded-xl bg-black/80 border border-yellow-500/30 text-yellow-400 text-sm font-bold flex items-center gap-1.5 shadow-md flex-shrink-0">
+                  <div className="hidden lg:inline px-3 py-1.5 rounded-xl bg-black/80 border border-yellow-500/30 text-yellow-400 text-xs font-bold flex items-center gap-1.5 shadow-md flex-shrink-0">
                     <i className="fa-solid fa-star text-xs" />
                     <span>{selectedEpisode ? selectedEpisode.rating : tv.rating}</span>
                   </div>
@@ -470,8 +470,8 @@ export default function TvDetail({
                 <i className="fa-solid fa-circle-info" />
                 <span>
                   {selectedEpisode
-                    ? `Episode ${selectedEpisode.episodeNumber} belum tersedia untuk streaming`
-                    : "Belum tersedia untuk streaming di Jazflix"}
+                    ? `Episode ${selectedEpisode.episodeNumber} belum tersedia`
+                    : "Belum tersedia di Jazflix"}
                 </span>
               </div>
             );

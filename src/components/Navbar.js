@@ -116,7 +116,7 @@ export default function Navbar({ onSearch }) {
           </div>
 
           {/* Desktop Nav Links */}
-          <div className="hidden lg:flex gap-6 text-sm items-center font-medium">
+          <div className="hidden md:flex gap-6 text-sm items-center font-medium">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -132,7 +132,8 @@ export default function Navbar({ onSearch }) {
             ))}
 
             {isUserAdmin && (
-              <div className="flex items-center gap-4 pl-4 border-l border-zinc-700">
+              <div className="hidden lg:flex items-center gap-4 pl-4 border-l border-zinc-700">
+                <span className="pr-4">•</span>
                 <Link
                   href="/admin"
                   className={`transition-colors duration-200 ${
@@ -265,7 +266,7 @@ export default function Navbar({ onSearch }) {
           )}
 
           {/* Desktop User / Auth Button */}
-          <div className="hidden md:flex items-center">
+          <div className="hidden lg:flex items-center">
             {currentUser ? (
               <div className="flex items-center gap-3 pl-2 border-l border-zinc-700">
                 <div className="flex items-center gap-2">
@@ -321,7 +322,7 @@ export default function Navbar({ onSearch }) {
           {/* Mobile Hamburger Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 text-zinc-400 hover:text-white focus:outline-none"
+            className="md:hidden p-2 text-zinc-400 hover:text-white focus:outline-none"
             aria-label="Toggle Navigation"
           >
             <i
@@ -333,7 +334,7 @@ export default function Navbar({ onSearch }) {
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-black/95 px-6 py-5 space-y-4 shadow-2xl animate-in fade-in duration-200">
+        <div className="md:hidden bg-black/95 px-6 py-5 space-y-4 shadow-2xl animate-in fade-in duration-200">
           <div className="flex flex-col space-y-3 text-sm font-medium">
             {navLinks.map((link) => (
               <Link

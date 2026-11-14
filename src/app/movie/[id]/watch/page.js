@@ -68,7 +68,7 @@ export default async function MovieWatch({ params }) {
     return (
       <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4">
         <p className="text-xl font-semibold mb-4 text-center">
-          Link video belum tersedia untuk film ini.
+          Video belum tersedia.
         </p>
         <Link
           href={`/movie/${id}`}
