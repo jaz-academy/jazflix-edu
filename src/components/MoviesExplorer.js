@@ -120,7 +120,7 @@ export default function MoviesExplorer({
       {/* Filter Tabs & Genre Selector Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         {/* Category Tabs (Desktop / Tablet: sm and up) */}
-        <div className="hidden sm:flex flex-wrap items-center gap-2">
+        <div className="hidden lg:flex flex-wrap items-center gap-2">
           {categories.map((cat) => (
             <button
               key={cat.id}
@@ -173,7 +173,7 @@ export default function MoviesExplorer({
 
         {/* Genre Selector (Desktop / Tablet: sm and up) */}
         {genres.length > 0 && (
-          <div className="hidden sm:flex items-center gap-2">
+          <div className="hidden lg:flex items-center gap-2">
             <span className="text-xs text-zinc-400 font-medium">Genre:</span>
             <select
               value={genre}

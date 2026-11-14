@@ -20,10 +20,10 @@ export default function MovieDetail({ movie, hasVideo = false }) {
   return (
     <div className="max-w-6xl mx-auto px-4">
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 rounded-xl overflow-hidden shadow-xl bg-zinc-900 relative min-h-[350px] md:min-h-[500px]">
+        <div className="md:col-span-2 rounded-xl overflow-hidden shadow-xl bg-zinc-900 relative min-h-[350px] lg:min-h-[500px]">
           {youTubeId ? (
             <iframe
-              className="w-full h-[350px] md:h-[500px] object-cover"
+              className="w-full h-full object-cover"
               src={`https://www.youtube.com/embed/${youTubeId}?autoplay=1&controls=1`}
               allowFullScreen
             ></iframe>

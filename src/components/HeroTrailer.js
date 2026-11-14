@@ -43,7 +43,7 @@ export default function HeroTrailer({ trending = [] }) {
   }, [activeIndex, isTVMode]);
 
   useEffect(() => {
-    if (swiperRef.current) return; // cegah init ulang
+    if (swiperRef.current || !trending || trending.length === 0) return;
 
     // Cegah browser / D-Pad remote melakukan native horizontal scroll pada container Swiper
     const container = document.querySelector(".myHero");
@@ -51,7 +51,7 @@ export default function HeroTrailer({ trending = [] }) {
 
     swiperRef.current = new Swiper(container, {
       modules: [Pagination, Autoplay],
-      loop: trending.length > 1,
+      rewind: trending.length > 1,
       speed: 600,
       autoplay: { delay: 30000, disableOnInteraction: false },
       pagination: { el: ".swiper-pagination", clickable: true },
@@ -60,9 +60,17 @@ export default function HeroTrailer({ trending = [] }) {
       preventClicksPropagation: true,
       on: {
         slideChange(swiper) {
-          setActiveIndex(swiper.realIndex);
-          if (swiper.el && swiper.el.scrollLeft !== 0) {
-            swiper.el.scrollLeft = 0;
+          setActiveIndex(swiper.activeIndex);
+          if (container && container.scrollLeft !== 0) {
+            container.scrollLeft = 0;
+          }
+        },
+        slideChangeTransitionEnd(swiper) {
+          // Sinkronkan fokus tombol Play saat user di TV berpindah slide via remote D-pad
+          const activeSlide = swiper.slides[swiper.activeIndex];
+          const playBtn = activeSlide?.querySelector("a.tv-focusable");
+          if (playBtn && document.activeElement?.closest(".myHero")) {
+            playBtn.focus();
           }
         },
       },
@@ -82,13 +90,15 @@ export default function HeroTrailer({ trending = [] }) {
       const { index, movieId } = e.detail || {};
 
       if (typeof index === "number") {
-        swiperRef.current.slideToLoop(index);
+        swiperRef.current.slideTo(index);
         return;
       }
 
       if (movieId && Array.isArray(trending)) {
-        const idx = trending.findIndex((m) => m._id === movieId);
-        if (idx >= 0) swiperRef.current.slideToLoop(idx);
+        const idx = trending.findIndex(
+          (m) => String(m._id || m.id || m.movieId) === String(movieId)
+        );
+        if (idx >= 0) swiperRef.current.slideTo(idx);
       }
     };
 
@@ -111,7 +121,7 @@ export default function HeroTrailer({ trending = [] }) {
       swiperRef.current?.destroy?.();
       swiperRef.current = null;
     };
-  }, []);
+  }, [trending]);
 
   return (
     <div className="swiper myHero relative w-full h-screen overflow-hidden">
@@ -119,12 +129,12 @@ export default function HeroTrailer({ trending = [] }) {
         {trending.map((movie, index) => {
           const id = getYouTubeId(movie.trailerUrl);
           const isActive = index === activeIndex;
+          const isPreload = index < 3;
           return (
             <div
               className="swiper-slide relative overflow-hidden"
-              key={movie.id || movie.movieId || movie._id}
+              key={movie.id || movie.movieId || movie._id || index}
               aria-hidden={!isActive}
-              inert={!isActive ? "" : undefined}
             >
               <div
                 className="relative w-full h-screen overflow-hidden bg-black"
@@ -138,7 +148,9 @@ export default function HeroTrailer({ trending = [] }) {
                   src={movie.bannerImage || movie.posterImage || "/images/hero-image.png"}
                   alt={movie.title || "banner"}
                   fill
-                  priority={index === 0}
+                  sizes="100vw"
+                  priority={isPreload}
+                  loading={index < 5 ? "eager" : "lazy"}
                   className={`object-cover transition-opacity duration-700
                       ${!isTVMode && isActive && videoReady ? "opacity-0" : "opacity-100"}`}
                 />

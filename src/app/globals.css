@@ -225,12 +225,14 @@ nav button.tv-focused {
   display: none !important;
 }
 
-/* 9. Swiper Hero Carousel - Kunci agar tidak pernah offset / terpotong setengah */
-.myHero,
-.myHero .swiper,
-.myHero .swiper-wrapper {
-  overflow-x: hidden !important;
+/* 9. Swiper Hero Carousel - Kunci agar container luar tidak pernah scroll natively */
+.myHero {
+  overflow: hidden !important;
   scroll-behavior: auto !important;
+}
+
+.myHero .swiper-wrapper {
+  overflow: visible !important;
 }
 
 .myHero .swiper-slide:not(.swiper-slide-active) {

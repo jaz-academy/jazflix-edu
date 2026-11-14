@@ -137,7 +137,7 @@ export default function PeopleExplorer({
       {/* Filter Tabs & Department Selector */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         {/* Category Tabs */}
-        <div className="hidden sm:flex flex-wrap items-center gap-2">
+        <div className="hidden lg:flex flex-wrap items-center gap-2">
           {categories.map((cat) => (
             <button
               key={cat.id}
@@ -171,13 +171,13 @@ export default function PeopleExplorer({
 
         {/* Department Selector */}
         <div className="flex-1 sm:flex-initial sm:flex sm:items-center sm:gap-2">
-          <span className="hidden sm:block text-xs text-zinc-400 font-medium">
+          <span className="hidden lg:block text-xs text-zinc-400 font-medium">
             Profesi:
           </span>
           <select
             value={department}
             onChange={(e) => handleDepartmentChange(e.target.value)}
-            className="w-full sm:w-50 px-3.5 py-2.5 sm:py-2 bg-zinc-900 border border-zinc-700 rounded-xl text-xs text-white focus:outline-none focus:border-red-500 cursor-pointer"
+            className="hidden lg:block w-full sm:w-50 px-3.5 py-2.5 sm:py-2 bg-zinc-900 border border-zinc-700 rounded-xl text-xs text-white focus:outline-none focus:border-red-500 cursor-pointer"
           >
             {departments.map((d) => (
               <option key={d.id} value={d.id}>
