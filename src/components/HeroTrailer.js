@@ -37,12 +37,27 @@ export default function HeroTrailer({ trending = [] }) {
       speed: 600,
       autoplay: { delay: 30000, disableOnInteraction: false },
       pagination: { el: ".swiper-pagination", clickable: true },
+      watchSlidesProgress: true,
+      preventClicks: true,
+      preventClicksPropagation: true,
       on: {
         slideChange(swiper) {
           setActiveIndex(swiper.realIndex);
+          if (container && container.scrollLeft !== 0) {
+            container.scrollLeft = 0;
+          }
         },
       },
     });
+
+    // Cegah browser / D-Pad remote melakukan native horizontal scroll pada container Swiper
+    const container = document.querySelector(".myHero");
+    const onScroll = () => {
+      if (container && container.scrollLeft !== 0) {
+        container.scrollLeft = 0;
+      }
+    };
+    container?.addEventListener("scroll", onScroll);
 
     // event jump (external trigger)
     const handler = (e) => {
@@ -76,6 +91,7 @@ export default function HeroTrailer({ trending = [] }) {
     return () => {
       window.removeEventListener("hero:jump", handler);
       document.removeEventListener("visibilitychange", onVisibility);
+      container?.removeEventListener("scroll", onScroll);
       swiperRef.current?.destroy?.();
       swiperRef.current = null;
     };
@@ -91,6 +107,8 @@ export default function HeroTrailer({ trending = [] }) {
             <div
               className="swiper-slide relative overflow-hidden"
               key={movie.id || movie.movieId || movie._id}
+              aria-hidden={!isActive}
+              inert={!isActive ? "" : undefined}
             >
               <div
                 className="relative w-full h-screen overflow-hidden bg-black"
@@ -155,7 +173,19 @@ export default function HeroTrailer({ trending = [] }) {
                 <br />
                 <Link
                   href={`/movie/${movie.id || movie.movieId || movie._id}`}
-                  className={`px-6 py-2 rounded-md font-semibold transition z-[9999] inline-flex items-center gap-2 ${
+                  tabIndex={isActive ? 0 : -1}
+                  onKeyDown={(e) => {
+                    if (e.key === "ArrowRight") {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      swiperRef.current?.slideNext();
+                    } else if (e.key === "ArrowLeft") {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      swiperRef.current?.slidePrev();
+                    }
+                  }}
+                  className={`tv-focusable px-6 py-2 rounded-md font-semibold transition z-[9999] inline-flex items-center gap-2 outline-none focus:ring-4 focus:ring-red-600 focus:shadow-[0_0_25px_rgba(220,38,38,0.9)] ${
                     movie.hasVideo
                       ? "bg-red-600 text-white hover:bg-red-700 shadow-lg shadow-red-900/50"
                       : "border-2 border-red-600 text-red-500 hover:bg-red-600 hover:text-white bg-black/40 backdrop-blur-sm"

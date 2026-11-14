@@ -48,6 +48,21 @@ export default function TVNavigationProvider({ children }) {
 
       const all = Array.from(document.querySelectorAll(selectors));
       return all.filter((el) => {
+        // Abaikan elemen di dalam slide Swiper yang tidak aktif
+        const swiperSlide = el.closest(".swiper-slide");
+        if (swiperSlide && !swiperSlide.classList.contains("swiper-slide-active")) {
+          return false;
+        }
+
+        // Abaikan elemen inert atau aria-hidden
+        if (el.closest("[inert]") || el.closest('[aria-hidden="true"]')) {
+          return false;
+        }
+
+        if (el.getAttribute("tabindex") === "-1") {
+          return false;
+        }
+
         const style = window.getComputedStyle(el);
         const rect = el.getBoundingClientRect();
         return (
@@ -173,6 +188,13 @@ export default function TVNavigationProvider({ children }) {
       // Cek apakah elemen ada di dalam carousel horizontal (misal Embla atau container overflow)
       let parent = el.parentElement;
       while (parent && parent !== document.body) {
+        // Jangan pernah scroll container Swiper Hero secara horizontal
+        if (parent.classList.contains("swiper") || parent.classList.contains("myHero")) {
+          parent.scrollLeft = 0;
+          parent = parent.parentElement;
+          continue;
+        }
+
         const style = window.getComputedStyle(parent);
         const canScrollX =
           style.overflowX === "auto" ||
