@@ -247,9 +247,36 @@ export default async function Home() {
     seriesShowing = fallbackTv;
   }
 
+  const pruneMovieCard = (m) => ({
+    id: m.id || m.movieId || (m._id ? String(m._id) : undefined),
+    movieId: m.movieId || m.id || (m._id ? String(m._id) : undefined),
+    tvId: m.tvId || m.id || (m._id ? String(m._id) : undefined),
+    title: m.title || "",
+    bannerImage: m.bannerImage || "",
+    posterImage: m.posterImage || "",
+    genres: Array.isArray(m.genres) ? m.genres.slice(0, 3) : [],
+    rating: m.rating || 0,
+    releaseYear: m.releaseYear || "",
+    ageRating: m.ageRating || "PG",
+    hasVideo: Boolean(m.hasVideo),
+  });
+
+  const pruneHeroMovie = (m) => ({
+    ...pruneMovieCard(m),
+    originalTitle: m.originalTitle || "",
+    description: m.description ? m.description.substring(0, 150) : "",
+    trailerUrl: m.trailerUrl || "",
+  });
+
   // Combine Movies & TV Series for "Our Collection"
   const formattedMovies = localMovies.map((m) => ({
-    ...m,
+    _id: String(m._id),
+    id: m.movieId || m.id || m._id,
+    movieId: m.movieId || m.id || m._id,
+    title: m.title || "",
+    releaseYear: m.releaseYear || 0,
+    posterImage: m.posterImage || "",
+    genres: m.genres || [],
     isSeries: false,
   }));
 
@@ -258,9 +285,9 @@ export default async function Home() {
     id: s.tvId || s._id,
     movieId: s.tvId || s._id,
     tvId: s.tvId || s._id,
-    title: s.title,
-    releaseYear: s.releaseYear,
-    posterImage: s.posterImage,
+    title: s.title || "",
+    releaseYear: s.releaseYear || 0,
+    posterImage: s.posterImage || "",
     genres: s.genres || [],
     isSeries: true,
   }));
@@ -286,14 +313,14 @@ export default async function Home() {
       movies={allCollections}
       genres={genres}
       years={years}
-      trending={heroMovies}
-      trendingWeekly={trendingWeekly}
-      populars={popular}
-      topRated={topRated}
-      upcoming={upcoming}
-      seriesPopular={seriesPopular}
-      seriesTopRated={seriesTopRated}
-      seriesShowing={seriesShowing}
+      trending={heroMovies.map(pruneHeroMovie)}
+      trendingWeekly={trendingWeekly.slice(0, 20).map(pruneMovieCard)}
+      populars={popular.slice(0, 20).map(pruneMovieCard)}
+      topRated={topRated.slice(0, 20).map(pruneMovieCard)}
+      upcoming={upcoming.slice(0, 20).map(pruneMovieCard)}
+      seriesPopular={seriesPopular.slice(0, 20).map(pruneMovieCard)}
+      seriesTopRated={seriesTopRated.slice(0, 20).map(pruneMovieCard)}
+      seriesShowing={seriesShowing.slice(0, 20).map(pruneMovieCard)}
     />
   );
 }

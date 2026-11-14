@@ -16,24 +16,42 @@ const getYouTubeId = (url) => {
 export default function HeroTrailer({ trending = [] }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [videoReady, setVideoReady] = useState(false);
+  const [isTVMode, setIsTVMode] = useState(false);
   const swiperRef = useRef(null);
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const isTV =
+        document.documentElement.classList.contains("tv-mode") ||
+        sessionStorage.getItem("jazflix_tv_mode") === "true" ||
+        /Android.*(TV|LargeScreen)|GoogleTV|SmartTV/i.test(navigator.userAgent) ||
+        new URLSearchParams(window.location.search).get("tv") === "1";
+      setIsTVMode(Boolean(isTV));
+    }
+  }, []);
+
+  useEffect(() => {
     setVideoReady(false);
+
+    if (isTVMode) return; // TV mode tidak perlu timer video iframe
 
     const timer = setTimeout(() => {
       setVideoReady(true);
     }, 2000);
 
     return () => clearTimeout(timer);
-  }, [activeIndex]);
+  }, [activeIndex, isTVMode]);
 
   useEffect(() => {
     if (swiperRef.current) return; // cegah init ulang
 
-    swiperRef.current = new Swiper(".myHero", {
+    // Cegah browser / D-Pad remote melakukan native horizontal scroll pada container Swiper
+    const container = document.querySelector(".myHero");
+    if (!container) return;
+
+    swiperRef.current = new Swiper(container, {
       modules: [Pagination, Autoplay],
-      loop: true,
+      loop: trending.length > 1,
       speed: 600,
       autoplay: { delay: 30000, disableOnInteraction: false },
       pagination: { el: ".swiper-pagination", clickable: true },
@@ -43,21 +61,19 @@ export default function HeroTrailer({ trending = [] }) {
       on: {
         slideChange(swiper) {
           setActiveIndex(swiper.realIndex);
-          if (container && container.scrollLeft !== 0) {
-            container.scrollLeft = 0;
+          if (swiper.el && swiper.el.scrollLeft !== 0) {
+            swiper.el.scrollLeft = 0;
           }
         },
       },
     });
 
-    // Cegah browser / D-Pad remote melakukan native horizontal scroll pada container Swiper
-    const container = document.querySelector(".myHero");
     const onScroll = () => {
       if (container && container.scrollLeft !== 0) {
         container.scrollLeft = 0;
       }
     };
-    container?.addEventListener("scroll", onScroll);
+    container.addEventListener("scroll", onScroll);
 
     // event jump (external trigger)
     const handler = (e) => {
@@ -124,11 +140,11 @@ export default function HeroTrailer({ trending = [] }) {
                   fill
                   priority={index === 0}
                   className={`object-cover transition-opacity duration-700
-                      ${isActive && videoReady ? "opacity-0" : "opacity-100"}`}
+                      ${!isTVMode && isActive && videoReady ? "opacity-0" : "opacity-100"}`}
                 />
 
-                {/* VIDEO muncul setelah delay */}
-                {isActive && videoReady && id && (
+                {/* VIDEO muncul setelah delay (Khusus Desktop, hemat RAM TV) */}
+                {!isTVMode && isActive && videoReady && id && (
                   <iframe
                     className="absolute top-1/2 left-1/2 w-[360%] xl:w-[140%]
                       h-[360%] xl:h-[140%] -translate-x-1/2 -translate-y-1/2"

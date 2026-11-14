@@ -2,6 +2,9 @@ package com.jazflix.tv;
 
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.View;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
@@ -9,10 +12,25 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getBridge() != null && getBridge().getWebView() != null) {
-            // Pastikan WebView dapat menerima fokus remote D-Pad TV segera saat aplikasi dibuka
-            getBridge().getWebView().setFocusable(true);
-            getBridge().getWebView().setFocusableInTouchMode(true);
-            getBridge().getWebView().requestFocus();
+            WebView webView = getBridge().getWebView();
+
+            // 1. D-Pad TV Focus
+            webView.setFocusable(true);
+            webView.setFocusableInTouchMode(true);
+            webView.requestFocus();
+
+            // 2. Hardware Acceleration & Performance Optimization untuk Google TV
+            webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+
+            WebSettings settings = webView.getSettings();
+            if (settings != null) {
+                settings.setDomStorageEnabled(true);
+                settings.setDatabaseEnabled(true);
+                settings.setCacheMode(WebSettings.LOAD_DEFAULT);
+                settings.setMediaPlaybackRequiresUserGesture(false);
+                settings.setUseWideViewPort(true);
+                settings.setLoadWithOverviewMode(true);
+            }
         }
     }
 

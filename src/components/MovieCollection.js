@@ -11,12 +11,20 @@ export default function MovieCollection({ movies, genres, years, keyword }) {
 
   const [year, setYear] = useState("All");
   const [genre, setGenre] = useState("All");
+  const [visibleCount, setVisibleCount] = useState(24);
 
   const filtered = movies
     .filter((m) => year === "All" || m.releaseYear == year)
     .filter((m) => genre === "All" || m.genres.includes(genre))
     .filter((m) => m.title.toLowerCase().includes(keyword.toLowerCase()))
     .sort((a, b) => b.releaseYear - a.releaseYear);
+
+  const visibleMovies = filtered.slice(0, visibleCount);
+  const hasMore = visibleCount < filtered.length;
+
+  const loadMore = () => {
+    setVisibleCount((prev) => Math.min(prev + 24, filtered.length));
+  };
 
   return (
     <section className="w-full px-4 mt-10" id="movies">
@@ -57,7 +65,7 @@ export default function MovieCollection({ movies, genres, years, keyword }) {
       </div>
 
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-9 gap-4 py-4">
-        {filtered.map((m, i) => {
+        {visibleMovies.map((m, i) => {
           const mId = m.movieId || m.tvId || m.id || m._id;
           const posterUrl = m.posterImage || "/images/no-photo.png";
           const href = m.isSeries
@@ -86,6 +94,17 @@ export default function MovieCollection({ movies, genres, years, keyword }) {
           );
         })}
       </div>
+
+      {hasMore && (
+        <div className="flex justify-center mt-6 mb-12">
+          <button
+            onClick={loadMore}
+            className="tv-focusable px-8 py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-sm font-semibold text-white transition focus:ring-2 focus:ring-red-600 focus:outline-none"
+          >
+            Tampilkan Lebih Banyak ({filtered.length - visibleCount} film lagi)
+          </button>
+        </div>
+      )}
     </section>
   );
 }

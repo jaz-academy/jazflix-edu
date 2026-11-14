@@ -136,23 +136,11 @@ a[href*="/tv/"]:focus-visible img,
   color: #f87171 !important; /* Tailwind red-400 */
 }
 
-/* 4. Pulsing Halo Glow Animation agar Card Selalu Terlihat Jelas di TV */
-@keyframes tvCardPulse {
-  0% {
-    box-shadow: 0 0 18px rgba(229, 9, 20, 0.65), 0 8px 20px rgba(0, 0, 0, 0.9);
-  }
-  50% {
-    box-shadow: 0 0 30px rgba(229, 9, 20, 0.85), 0 10px 25px rgba(0, 0, 0, 0.95);
-  }
-  100% {
-    box-shadow: 0 0 18px rgba(229, 9, 20, 0.65), 0 8px 20px rgba(0, 0, 0, 0.9);
-  }
-}
-
+/* 4. Indikator Fokus Statis Kontras Tinggi (Bebas dari CPU/GPU Repaint Loop untuk TV) */
 .tv-card:focus,
 a[href*="/movie/"]:focus,
 a[href*="/tv/"]:focus {
-  animation: tvCardPulse 2s infinite ease-in-out;
+  animation: none !important;
 }
 
 /* 5. Hilangkan Total Efek Zoom dan Border pada Semua Menu di Navbar */

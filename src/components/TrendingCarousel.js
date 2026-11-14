@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import AutoScroll from "embla-carousel-auto-scroll";
 
@@ -17,6 +18,24 @@ export default function TrendingCarousel({ trending = [] }) {
       }),
     ],
   );
+
+  // Pada TV Mode, hentikan AutoScroll loop agar GPU Mali TV tidak terbebani di 60 FPS
+  useEffect(() => {
+    if (!emblaApi) return;
+    const isTV =
+      typeof window !== "undefined" &&
+      (document.documentElement.classList.contains("tv-mode") ||
+        sessionStorage.getItem("jazflix_tv_mode") === "true" ||
+        /Android.*(TV|LargeScreen)|GoogleTV|SmartTV/i.test(navigator.userAgent) ||
+        new URLSearchParams(window.location.search).get("tv") === "1");
+
+    if (isTV) {
+      const autoScrollPlugin = emblaApi.plugins()?.autoScroll;
+      if (autoScrollPlugin) {
+        autoScrollPlugin.stop();
+      }
+    }
+  }, [emblaApi]);
 
   const handleClick = (index, movieId) => {
     // scroll embla to clicked card (optional)
