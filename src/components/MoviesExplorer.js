@@ -214,14 +214,14 @@ export default function MoviesExplorer({
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 xl:grid-cols-6 gap-5">
           {movies.map((m) => {
             const mId = m.movieId || m.id || m._id;
             return (
               <Link
                 key={mId}
                 href={`/movie/${mId}`}
-                className="group flex flex-col justify-between rounded-2xl overflow-hidden bg-zinc-900/90 border border-zinc-800/80 hover:border-red-500/60 transition-all duration-300 hover:scale-105 shadow-xl"
+                className="tv-card group flex flex-col justify-between rounded-2xl overflow-hidden bg-zinc-900/90 border border-zinc-800/80 hover:border-red-500/60 focus:border-red-600 transition-all duration-200 hover:scale-[1.03] focus:scale-[1.03] focus:ring-2 focus:ring-red-600 focus:shadow-[0_0_20px_rgba(220,38,38,0.8)] outline-none shadow-xl z-0 hover:z-20 focus:z-30"
               >
                 {/* Poster Box */}
                 <div className="aspect-[4/6] relative bg-zinc-950 overflow-hidden">
@@ -230,7 +230,7 @@ export default function MoviesExplorer({
                     alt={m.title}
                     fill
                     sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 16vw"
-                    className="object-cover group-hover:scale-105 transition duration-300"
+                    className="object-cover group-hover:scale-[1.03] group-focus:scale-[1.03] transition duration-300"
                   />
 
                   {/* Rating Badge */}
@@ -262,7 +262,7 @@ export default function MoviesExplorer({
                 {/* Movie Meta Information */}
                 <div className="p-3.5 flex flex-col justify-between flex-1">
                   <div>
-                    <h2 className="font-bold text-sm text-white group-hover:text-red-400 transition line-clamp-1 leading-snug">
+                    <h2 className="font-bold text-sm text-white group-hover:text-red-400 group-focus:text-red-400 transition line-clamp-1 leading-snug">
                       {m.title}
                     </h2>
                     <div className="flex items-center justify-between text-[11px] text-zinc-400 mt-1">

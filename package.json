@@ -8,9 +8,16 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "reset:users": "node scripts/wipe-users.js"
+    "reset:users": "node scripts/wipe-users.js",
+    "cap:sync": "npx cap sync android",
+    "cap:open": "npx cap open android",
+    "tv:build": "cmd /c \"set JAVA_HOME=C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.13.9-hotspot&& cd android && gradlew assembleDebug\"",
+    "tv:install": "adb install -r android/app/build/outputs/apk/debug/app-debug.apk"
   },
   "dependencies": {
+    "@capacitor/android": "^8.6.2",
+    "@capacitor/cli": "^8.6.2",
+    "@capacitor/core": "^8.6.2",
     "bcryptjs": "^3.0.3",
     "embla-carousel-auto-scroll": "^8.6.0",
     "embla-carousel-react": "^8.6.0",

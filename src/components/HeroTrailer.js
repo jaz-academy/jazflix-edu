@@ -121,10 +121,10 @@ export default function HeroTrailer({ trending = [] }) {
               </div>
 
               <div className="absolute z-20 left-10 md:left-20 top-1/3 -translate-y-1/2 max-w-lg space-y-3 pt-23  max-md:landscape:pt-2">
-                <h1 className="text-4xl md:text-5xl font-bold leading-tight">
+                <h1 className="text-4xl font-bold leading-tight">
                   {movie.title}
                 </h1>
-                <h3 className="text-lg md:text-xl font-bold leading-tight max-md:landscape:hidden">
+                <h3 className="hidden lg:block text-lg md:text-xl font-bold leading-tight max-md:landscape:hidden">
                   {movie.originalTitle}
                 </h3>
                 <div className="flex items-center gap-3 max-md:landscape:hidden">
@@ -172,7 +172,7 @@ export default function HeroTrailer({ trending = [] }) {
       </div>
 
       <div
-        className="swiper-pagination absolute !bottom-36 left-0 w-full z-[9999]"
+        className="hidden lg:block swiper-pagination absolute !bottom-36 left-0 w-full z-[9999]"
         id="popular"
       ></div>
     </div>

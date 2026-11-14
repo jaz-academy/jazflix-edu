@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 function formatTime(seconds) {
   if (isNaN(seconds) || seconds === null) return "00:00";
@@ -39,6 +40,7 @@ export default function CleanVideoPlayer({
   videoUrl = "",
   subTitle = "",
 }) {
+  const router = useRouter();
   const videoRef = useRef(null);
   const containerRef = useRef(null);
   const controlsTimeoutRef = useRef(null);
@@ -114,13 +116,13 @@ export default function CleanVideoPlayer({
   };
 
   // Skip 10 seconds forward / backward
-  const skipTime = (seconds) => {
+  const skipTime = useCallback((seconds) => {
     if (!videoRef.current) return;
     const newTime = Math.max(0, Math.min(videoRef.current.currentTime + seconds, duration));
     videoRef.current.currentTime = newTime;
     setCurrentTime(newTime);
     resetControlsTimeout();
-  };
+  }, [duration, resetControlsTimeout]);
 
   // Double tap on mobile to skip
   const handleTap = (e) => {
@@ -138,7 +140,7 @@ export default function CleanVideoPlayer({
     }
   };
 
-  const toggleMute = () => {
+  const toggleMute = useCallback(() => {
     if (!videoRef.current) return;
     const newMute = !isMuted;
     videoRef.current.muted = newMute;
@@ -147,7 +149,7 @@ export default function CleanVideoPlayer({
       setVolume(0.5);
       videoRef.current.volume = 0.5;
     }
-  };
+  }, [isMuted, volume]);
 
   // Handle Fullscreen Toggle
   const toggleFullscreen = async () => {
@@ -207,25 +209,62 @@ export default function CleanVideoPlayer({
     };
   }, []);
 
-  // Keyboard Shortcuts
+  // Cleanup video buffers & memory on unmount (essential for Android TV 2GB RAM)
+  useEffect(() => {
+    const videoEl = videoRef.current;
+    const timeoutId = controlsTimeoutRef.current;
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+      if (videoEl) {
+        try {
+          videoEl.pause();
+          videoEl.removeAttribute("src");
+          videoEl.load();
+        } catch (e) {
+          // Ignore cleanup errors
+        }
+      }
+    };
+  }, []);
+
+  // Keyboard & TV Remote Control Shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (["input", "textarea"].includes(document.activeElement?.tagName?.toLowerCase())) {
         return;
       }
-      switch (e.key.toLowerCase()) {
+      const key = e.key ? e.key.toLowerCase() : "";
+      const keyCode = e.keyCode;
+
+      switch (key) {
         case " ":
         case "k":
+        case "enter":
+        case "select":
+        case "mediaplaypause":
           e.preventDefault();
           togglePlay();
           break;
+        case "mediaplay":
+          e.preventDefault();
+          if (videoRef.current && videoRef.current.paused) togglePlay();
+          break;
+        case "mediapause":
+        case "mediastop":
+          e.preventDefault();
+          if (videoRef.current && !videoRef.current.paused) togglePlay();
+          break;
         case "arrowleft":
         case "j":
+        case "mediarewind":
           e.preventDefault();
           skipTime(-10);
           break;
         case "arrowright":
         case "l":
+        case "mediafastforward":
           e.preventDefault();
           skipTime(10);
           break;
@@ -253,13 +292,39 @@ export default function CleanVideoPlayer({
             return nv;
           });
           break;
+        case "escape":
+        case "goback":
+          e.preventDefault();
+          if (showSpeedMenu) {
+            setShowSpeedMenu(false);
+          } else if (document.fullscreenElement) {
+            toggleFullscreen();
+          } else if (backUrl) {
+            router.push(backUrl);
+          } else {
+            router.back();
+          }
+          break;
         default:
+          if (keyCode === 4) {
+            // Android TV Back button
+            e.preventDefault();
+            if (showSpeedMenu) {
+              setShowSpeedMenu(false);
+            } else if (document.fullscreenElement) {
+              toggleFullscreen();
+            } else if (backUrl) {
+              router.push(backUrl);
+            } else {
+              router.back();
+            }
+          }
           break;
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [togglePlay]);
+  }, [togglePlay, showSpeedMenu, backUrl, router, skipTime, toggleMute]);
 
   // Video Time Update & Buffer
   const onTimeUpdate = () => {

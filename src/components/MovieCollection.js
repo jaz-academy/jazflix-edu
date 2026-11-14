@@ -56,7 +56,7 @@ export default function MovieCollection({ movies, genres, years, keyword }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-9 gap-4">
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-9 gap-4 py-4">
         {filtered.map((m, i) => {
           const mId = m.movieId || m.tvId || m.id || m._id;
           const posterUrl = m.posterImage || "/images/no-photo.png";
@@ -64,26 +64,25 @@ export default function MovieCollection({ movies, genres, years, keyword }) {
             ? `/tv/${m.tvId || m.id || mId}`
             : `/movie/${mId}`;
           return (
-            <div
+            <Link
               key={m._id || i}
-              className="rounded overflow-hidden hover:scale-105 cursor-pointer transition relative bg-zinc-900 aspect-[4/6]"
+              href={href}
+              className="tv-card group rounded-xl overflow-hidden hover:scale-[1.03] focus:scale-[1.03] focus:ring-2 focus:ring-red-600 focus:shadow-[0_0_20px_rgba(220,38,38,0.8)] cursor-pointer transition-all duration-200 relative bg-zinc-900 aspect-[4/6] outline-none block z-0 hover:z-20 focus:z-30"
             >
-              <Link href={href}>
-                <Image
-                  src={posterUrl}
-                  alt={m.title || "poster"}
-                  width={300}
-                  height={450}
-                  className="w-full h-full object-cover rounded-xl"
-                />
-                {/* Badge SERIES di pojok kiri atas untuk serial TV */}
-                {m.isSeries && (
-                  <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded-md bg-black/80 backdrop-blur-md text-zinc-300 text-[9px] sm:text-[10px] font-semibold border border-zinc-700 shadow-md">
-                    SERIES
-                  </div>
-                )}
-              </Link>
-            </div>
+              <Image
+                src={posterUrl}
+                alt={m.title || "poster"}
+                width={300}
+                height={450}
+                className="w-full h-full object-cover rounded-xl group-hover:scale-[1.03] group-focus:scale-[1.03] transition-transform duration-200"
+              />
+              {/* Badge SERIES di pojok kiri atas untuk serial TV */}
+              {m.isSeries && (
+                <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded-md bg-black/80 text-zinc-300 text-[9px] sm:text-[10px] font-semibold border border-zinc-700 shadow-md">
+                  SERIES
+                </div>
+              )}
+            </Link>
           );
         })}
       </div>

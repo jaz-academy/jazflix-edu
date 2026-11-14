@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import TVNavigationProvider from "@/components/TVNavigationProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,7 +19,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         {/* <!-- Font Awesome --> */}
         <link rel="preconnect" href="https://www.youtube.com" />
@@ -32,8 +33,11 @@ export default function RootLayout({ children }) {
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
       >
-        {children}
+        <TVNavigationProvider>
+          {children}
+        </TVNavigationProvider>
         <script
           dangerouslySetInnerHTML={{
             __html: `

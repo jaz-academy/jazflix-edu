@@ -38,38 +38,38 @@ function SeriesCarouselTrack({ series = [] }) {
             return (
               <div
                 key={sId || i}
-                className="embla__slide flex-shrink-0 ml-4 cursor-pointer"
-                style={{ width: 360 }}
+                className="embla__slide flex-shrink-0 ml-4 cursor-pointer py-3 w-[220px] md:w-[260px] lg:w-[310px] xl:w-[360px]"
               >
-                <div className="rounded-xl overflow-hidden relative w-[360px] h-60 bg-zinc-900 group">
-                  <Link href={`/tv/${sId}`}>
-                    <Image
-                      className="w-full h-60 object-cover hover:scale-105 transition duration-300"
-                      alt={item.title || "Series"}
-                      src={imgUrl}
-                      width={360}
-                      height={240}
-                    />
-                  </Link>
+                <Link
+                  href={`/tv/${sId}`}
+                  className="tv-card group block rounded-xl overflow-hidden relative w-full h-36 md:h-40 lg:h-48 xl:h-56 bg-zinc-900 transition-all duration-200 outline-none hover:scale-[1.03] focus:scale-[1.03] focus:ring-2 focus:ring-red-600 focus:shadow-[0_0_20px_rgba(220,38,38,0.8)] z-0 hover:z-20 focus:z-30"
+                >
+                  <Image
+                    className="w-full h-full object-cover group-hover:scale-[1.03] group-focus:scale-[1.03] transition duration-300"
+                    alt={item.title || "Series"}
+                    src={imgUrl}
+                    width={360}
+                    height={240}
+                  />
 
                   {/* Top-Left: SERIES Badge */}
-                  <div className="absolute top-3 left-3 z-10 px-2 py-0.5 rounded-md bg-black/80 backdrop-blur-md text-zinc-300 text-[10px] font-semibold border border-zinc-700 shadow-md">
+                  <div className="absolute top-2.5 left-2.5 z-10 px-2 py-0.5 rounded-md bg-black/80 text-zinc-300 text-[10px] font-semibold border border-zinc-700 shadow-md">
                     SERIES
                   </div>
 
                   {/* Top-Right: Play icon kotak merah jika tersedia di MongoDB */}
                   {item.hasVideo && (
                     <div
-                      className="absolute top-3 right-3 z-10 w-7 h-7 rounded-lg bg-red-600/90 text-white flex items-center justify-center shadow-lg shadow-red-950/60 backdrop-blur-sm border border-red-400/40 pointer-events-none"
+                      className="absolute top-2.5 right-2.5 z-10 w-7 h-7 rounded-lg bg-red-600/90 text-white flex items-center justify-center shadow-lg shadow-red-950/60 border border-red-400/40 pointer-events-none"
                       title="Tersedia untuk ditonton di Jazflix"
                     >
                       <i className="fa-solid fa-play text-xs" />
                     </div>
                   )}
-                </div>
+                </Link>
 
                 <div className="rounded-b-xl text-bold text-sm mt-2">
-                  <span className="text-bold text-gray-300">
+                  <span className="text-bold text-gray-300 group-hover:text-red-400 group-focus:text-red-400 transition">
                     {item.title}{" "}
                   </span>
                   {genreStr && `- ${genreStr}`}

@@ -1,12 +1,15 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 export default function Navbar({ onSearch }) {
   const pathname = usePathname();
+  const navRef = useRef(null);
   const [scrolled, setScrolled] = useState(false);
+  const [isAtTop, setIsAtTop] = useState(true);
+  const [isNavFocused, setIsNavFocused] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [keyword, setKeyword] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -19,9 +22,12 @@ export default function Navbar({ onSearch }) {
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      const currentScrollY = window.scrollY || window.pageYOffset;
+      setIsAtTop(currentScrollY <= 15);
+      setScrolled(currentScrollY > 20);
     };
-    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     // Fetch current user
     const checkUser = async () => {
@@ -44,10 +50,21 @@ export default function Navbar({ onSearch }) {
     };
   }, []);
 
-  // Close mobile menu on page navigation
+  // Close mobile menu on page navigation or Back / Escape key
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.key === "Escape" || e.keyCode === 27 || e.keyCode === 4) && mobileMenuOpen) {
+        e.stopPropagation();
+        setMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [mobileMenuOpen]);
 
   const isUserAdmin =
     currentUser?.role === "admin" || currentUser?.role === "superadmin";
@@ -64,9 +81,28 @@ export default function Navbar({ onSearch }) {
     return pathname.startsWith(href);
   };
 
+  const handleFocusIn = () => {
+    setIsNavFocused(true);
+  };
+
+  const handleFocusOut = (e) => {
+    if (!navRef.current?.contains(e.relatedTarget)) {
+      setIsNavFocused(false);
+    }
+  };
+
+  const isVisibleOnMobile = isAtTop || isNavFocused || mobileMenuOpen || showSearch;
+
   return (
     <nav
-      className={`fixed top-0 left-0 w-full z-50 transition-colors duration-300 ${
+      ref={navRef}
+      onFocus={handleFocusIn}
+      onBlur={handleFocusOut}
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ease-in-out ${
+        isVisibleOnMobile
+          ? "translate-y-0 opacity-100 pointer-events-auto"
+          : "-translate-y-full opacity-0 pointer-events-none lg:translate-y-0 lg:opacity-100 lg:pointer-events-auto"
+      } ${
         scrolled || mobileMenuOpen
           ? "bg-black/95 shadow-2xl"
           : "bg-gradient-to-b from-black/90 via-black/40 to-transparent"
@@ -75,12 +111,9 @@ export default function Navbar({ onSearch }) {
       <div className="w-full flex items-center justify-between px-4 md:px-8 py-3.5">
         {/* Logo & Main Nav */}
         <div className="flex items-center gap-8">
-          <Link
-            href="/"
-            className="text-2xl font-black text-red-600 tracking-wider hover:opacity-90 transition flex items-center gap-1.5"
-          >
+          <div className="text-2xl font-black text-red-600 tracking-wider flex items-center gap-1.5 select-none cursor-default">
             <span>JAZFLIX</span>
-          </Link>
+          </div>
 
           {/* Desktop Nav Links */}
           <div className="hidden lg:flex gap-6 text-sm items-center font-medium">
@@ -306,6 +339,7 @@ export default function Navbar({ onSearch }) {
               <Link
                 key={link.href}
                 href={link.href}
+                onClick={() => setMobileMenuOpen(false)}
                 className={`py-2 px-3 rounded-lg transition ${
                   isActive(link.href)
                     ? "bg-red-600/20 text-red-500 font-bold"
