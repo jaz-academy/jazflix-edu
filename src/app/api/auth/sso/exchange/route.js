@@ -37,6 +37,7 @@ export async function POST(request) {
         Accept: "application/json",
       },
       body: tokenParams.toString(),
+      signal: AbortSignal.timeout(10000),
     });
 
     if (!tokenResponse.ok) {
@@ -56,6 +57,7 @@ export async function POST(request) {
         Authorization: `Bearer ${accessToken}`,
         Accept: "application/json",
       },
+      signal: AbortSignal.timeout(10000),
     });
 
     if (!userinfoResponse.ok) {
@@ -101,8 +103,17 @@ export async function POST(request) {
     return response;
   } catch (error) {
     console.error("Error in SSO exchange:", error);
+    let errMsg = "Terjadi kesalahan pada server saat autentikasi SSO";
+    if (
+      error.name === "TimeoutError" ||
+      error.message?.includes("timeout") ||
+      error.code === "ECONNRESET" ||
+      error.message?.includes("fetch failed")
+    ) {
+      errMsg = "Server Jaz Academy sedang tidak dapat dijangkau (Offline/Timeout).";
+    }
     return NextResponse.json(
-      { error: "Terjadi kesalahan pada server saat autentikasi SSO" },
+      { error: errMsg },
       { status: 500 }
     );
   }
